@@ -1,4 +1,3 @@
-from os.path import exists
 from typing import Any
 
 import torch
@@ -6,26 +5,8 @@ from erbium.api import get_all_gpu_info
 from rich.console import Console
 from rich.table import Table
 
+from mle.engine import check_dataset, check_preprocessed_dataset
 from mle.vars import ExpConfig
-
-
-def check_dataset(config: ExpConfig) -> str:
-    if not exists(config.dataset_dir):
-        return f"Not found: {config.dataset_dir}"
-    if not exists(f"{config.dataset_dir}/training"):
-        return f"Invalid: missing the training split"
-    if not exists(f"{config.dataset_dir}/validation_public"):
-        return f"Invalid: missing the public validation split"
-    extras = []
-    if exists(f"{config.dataset_dir}/validation_hidden"):
-        extras.append("hidden validation")
-    if exists(f"{config.dataset_dir}/testing"):
-        extras.append("testing")
-    return f"OK with {"and".join(extras)}" if extras else "OK"
-
-
-def check_preprocessed_dataset(config: ExpConfig) -> str:
-    return "OK" if exists(config.preprocessed_dataset_dir) else f"Not found: {config.preprocessed_dataset_dir}"
 
 
 def check_environment(config: ExpConfig) -> dict[str, Any]:

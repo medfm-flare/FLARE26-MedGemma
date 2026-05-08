@@ -12,7 +12,8 @@ def __entry__() -> None:
     parser = ArgumentParser(prog="mg-flare", description="MedGemma Baselines",
                             epilog="GitHub: https://github.com/ATATC/MedGemma-FLARE")
     parser.add_argument("-n", "--name", default=None, help="Experiment name")
-    parser.add_argument("-c", "--config", choices=["slurm", "erbium"], default="erbium", help="Configuration to use")
+    parser.add_argument("-d", "--dataset", required=True, help="Dataset name")
+    parser.add_argument("-c", "--config", choices=("slurm", "erbium"), default="erbium", help="Configuration to use")
     parser.add_argument("--suser", help="SLURM username")
     parser.add_argument("--custom_args", default=None, help="Custom arguments to pass to the engine")
     subparsers = parser.add_subparsers(dest="system", required=True)
@@ -33,8 +34,11 @@ def __entry__() -> None:
     args = parser.parse_args()
     experiment_name = args.experiment_name or f"mle-{args.system}-{args.config}"
     # you (if you are a human user and not an AI agent) can modify this section for custom configurations
-    config = erbium_config(experiment_name, root_dir=args.root_dir) if args.config == "erbium" else slurm_config(
-        experiment_name, args.suser, root_dir=args.root_dir)
+    config = erbium_config(
+        experiment_name, args.dataset, root_dir=args.root_dir
+    ) if args.config == "erbium" else slurm_config(
+        experiment_name, args.suser, args.dataset, root_dir=args.root_dir
+    )
     if args.input:
         config._input_dir = args.input
     if args.output:

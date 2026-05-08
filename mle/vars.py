@@ -9,7 +9,7 @@ from rich.console import Console
 class ExpConfig(object):
     experiment_name: str
     root_dir: str
-    dataset_name: str = "FLARE-MLLM-2D"
+    dataset_name: str
     _input_dir: str | None = None
     _output_dir: str | None = None
 
@@ -40,9 +40,9 @@ class ExpConfig(object):
             makedirs(self.output_dir)
 
 
-def erbium_config(experiment_name: str, *, root_dir: str | None = None) -> ExpConfig:
-    return ExpConfig(experiment_name, root_dir or f"/workspace")
+def erbium_config(experiment_name: str, dataset_name: str, *, root_dir: str | None = None) -> ExpConfig:
+    return ExpConfig(experiment_name, root_dir or f"/workspace", dataset_name)
 
 
-def slurm_config(experiment_name: str, username: str, *, root_dir: str | None = None) -> ExpConfig:
-    return ExpConfig(experiment_name, root_dir or f"/scratch/{username}")
+def slurm_config(experiment_name: str, username: str, dataset_name: str, *, root_dir: str | None = None) -> ExpConfig:
+    return ExpConfig(experiment_name, root_dir or f"/scratch/{username}", dataset_name)

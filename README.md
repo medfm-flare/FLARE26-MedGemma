@@ -22,6 +22,18 @@ For example, suppose we want to fine-tune MedGemma 1.5 on the FLARE-MLLM-2D data
 
 ## Usage
 
+### Local
+
+The commands are the same as on Erbium, but you need to use these flags to specify the paths:
+
+```shell
+--root_dir path/to/project/root
+--input_dir path/to/input/directory
+--output_dir path/to/output/directory
+```
+
+Your dataset should be available at "{INPUT_DIR}/{DATASET_NAME}".
+
 ### On Erbium
 
 #### Install Your Modified Codebase
@@ -36,7 +48,7 @@ If you cloned MLE and are working locally, upload the source files to "/workspac
 
 ```shell
 cd /workspace/app
-pip install -e.
+pip install -e .
 ```
 
 #### Run Your Modified Codebase
@@ -57,6 +69,8 @@ python -m mle evaluate segmentation
 
 #### Install Your Modified Codebase
 
+Create a virtual environment and install some critical dependencies first.
+
 ```shell
 module load python/3.12
 module load arrow
@@ -64,8 +78,30 @@ module load cuda
 virtualenv /scratch/${USER}/venv
 source /scratch/${USER}/venv/bin/activate
 pip install --no-index --upgrade pip
-pip install --no-index simpleitk  # because building wheels for simpleitk is too slow
-pip install git+https://github.com/ProjectNeura/MLE
+pip install --no-index simpleitk  # critical dependencies whose wheels for simpleitk are too slow to build
+```
+
+Note that unlike Erbium where we reinforce the file structure, you probably need to create the input and output
+directories yourself on SLURM clusters.
+
+```shell
+mkdir /scratch/${USER}/input
+mkdir /scratch/${USER}/output
+```
+
+Your dataset should be available at "/scratch/{USER}/{DATASET_NAME}".
+
+If you are working inside a fork of MLE, you can install it directly from GitHub.
+
+```shell
+pip install git+https://github.com/your-username/your-forked-repo
+```
+
+If you cloned MLE and are working locally, upload the source files to "/scratch/${USER}/app" and install it from there.
+
+```shell
+cd /scratch/${USER}/app
+pip install -e .
 ```
 
 #### Run Your Modified Codebase
@@ -98,7 +134,7 @@ module load cuda || true
 # authentication
 ...
 
-python -m mle ...
+python -m mle -c slurm -suser ${USER} ...
 ```
 
 ### Custom Arguments
