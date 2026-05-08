@@ -7,12 +7,15 @@ from rich.console import Console
 
 @dataclass
 class ExpConfig(object):
+    experiment_name: str
     root_dir: str
     dataset_name: str = "FLARE-MLLM-2D"
+    _input_dir: str | None = None
+    _output_dir: str | None = None
 
     @property
     def input_dir(self) -> str:
-        return f"{self.root_dir}/input"
+        return self._input_dir or f"{self.root_dir}/input"
 
     @property
     def dataset_dir(self) -> str:
@@ -24,7 +27,7 @@ class ExpConfig(object):
 
     @property
     def output_dir(self) -> str:
-        return f"{self.root_dir}/output"
+        return self._output_dir or f"{self.root_dir}/output"
 
     def initialize(self, *, console: Console = Console()) -> None:
         if not exists(self.root_dir):
@@ -37,9 +40,9 @@ class ExpConfig(object):
             makedirs(self.output_dir)
 
 
-def erbium_config() -> ExpConfig:
-    return ExpConfig(f"/workspace")
+def erbium_config(experiment_name: str, *, root_dir: str | None = None) -> ExpConfig:
+    return ExpConfig(experiment_name, root_dir or f"/workspace")
 
 
-def slurm_config(username: str) -> ExpConfig:
-    return ExpConfig(f"/scratch/{username}")
+def slurm_config(experiment_name: str, username: str, *, root_dir: str | None = None) -> ExpConfig:
+    return ExpConfig(experiment_name, root_dir or f"/scratch/{username}")

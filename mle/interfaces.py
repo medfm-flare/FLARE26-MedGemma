@@ -1,6 +1,6 @@
-from mg_flare.vars import ExpConfig
-from mg_flare.sanity import check_environment, print_environment_check_results, check_satisfied_or_throw
-from mg_flare.engine import preprocess as _preprocess, train as _train, evaluate as _evaluate
+from mle.vars import ExpConfig
+from mle.sanity import check_environment, print_environment_check_results, check_satisfied_or_throw
+from mle.engine import preprocess as _preprocess, train as _train, evaluate as _evaluate
 
 
 def preprocess(config: ExpConfig, **kwargs) -> None:

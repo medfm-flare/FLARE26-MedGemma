@@ -1,5 +1,5 @@
 from rich.console import Console
-from mg_flare.vars import ExpConfig
+from mle.vars import ExpConfig
 
 
 def preprocess(config: ExpConfig, use_wandb: bool, *, console: Console = Console(), **kwargs) -> None:

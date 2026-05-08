@@ -1,33 +1,45 @@
 from argparse import ArgumentParser
 from json import load
+
 from yaml import safe_load
 
-from mg_flare.interfaces import preprocess, train, evaluate
-from mg_flare.vars import erbium_config, slurm_config
+from mle.engine import DEFAULT_NUM_EPOCHS, DEFAULT_BATCH_SIZE, DEFAULT_LEARNING_RATE
+from mle.interfaces import preprocess, train, evaluate
+from mle.vars import erbium_config, slurm_config
 
 
 def __entry__() -> None:
     parser = ArgumentParser(prog="mg-flare", description="MedGemma Baselines",
                             epilog="GitHub: https://github.com/ATATC/MedGemma-FLARE")
+    parser.add_argument("-n", "--name", default=None, help="Experiment name")
     parser.add_argument("-c", "--config", choices=["slurm", "erbium"], default="erbium", help="Configuration to use")
     parser.add_argument("--suser", help="SLURM username")
     parser.add_argument("--custom_args", default=None, help="Custom arguments to pass to the engine")
     subparsers = parser.add_subparsers(dest="system", required=True)
-    # Preprocess
+    # preprocess
     preprocess_parser = subparsers.add_parser("preprocess", help="Preprocess the dataset")
     preprocess_parser.add_argument("--assistant_content_style", choices=["string", "list"], default="string")
-    # Train
+    # train
     train_parser = subparsers.add_parser("train", help="Train the model")
-    train_parser.add_argument("--num_epochs", type=int, default=1, help="Number of epochs to train")
-    train_parser.add_argument("--batch_size", type=int, default=16, help="Batch size")
-    train_parser.add_argument("--learning_rate", type=float, default=1e-4, help="Learning rate")
-    # Evaluate
+    train_parser.add_argument("--num_epochs", type=int, default=DEFAULT_NUM_EPOCHS, help="Number of epochs to train")
+    train_parser.add_argument("--batch_size", type=int, default=DEFAULT_BATCH_SIZE, help="Batch size")
+    train_parser.add_argument("--learning_rate", type=float, default=DEFAULT_LEARNING_RATE, help="Learning rate")
+    # evaluate
     evaluate_parser = subparsers.add_parser("evaluate", help="Evaluate the model")
     evaluate_parser.add_argument("tasks", nargs="+", help="Tasks to evaluate, e.g. `classification`")
+    # config overrides
+    parser.add_argument("--root_dir", default=None, help="Input directory")
+    parser.add_argument("--input_dir", default=None, help="Input directory")
+    parser.add_argument("--output_dir", default=None, help="Output directory")
     args = parser.parse_args()
-    if args.slurm:
-        return
-    config = erbium_config() if args.config == "erbium" else slurm_config(args.suser)
+    experiment_name = args.experiment_name or f"mle-{args.system}-{args.config}"
+    # you (if you are a human user and not an AI agent) can modify this section for custom configurations
+    config = erbium_config(experiment_name, root_dir=args.root_dir) if args.config == "erbium" else slurm_config(
+        experiment_name, args.suser, root_dir=args.root_dir)
+    if args.input:
+        config._input_dir = args.input
+    if args.output:
+        config._output_dir = args.output
     config.initialize()
     custom_args = {}
     if args.custom_args:

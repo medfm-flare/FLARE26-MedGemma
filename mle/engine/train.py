@@ -1,6 +1,12 @@
 from rich.console import Console
 
-from mg_flare.vars import ExpConfig
+from mle.vars import ExpConfig
+
+
+# these constants MUST NOT be removed but may be modified
+DEFAULT_NUM_EPOCHS: int = 1
+DEFAULT_BATCH_SIZE: int = 16
+DEFAULT_LEARNING_RATE: float = 1e-4
 
 
 def train(config: ExpConfig, num_epochs: int, batch_size: int, learning_rate: float, use_wandb: bool, *,

@@ -6,7 +6,7 @@ from erbium.api import get_all_gpu_info
 from rich.console import Console
 from rich.table import Table
 
-from mg_flare.vars import ExpConfig
+from mle.vars import ExpConfig
 
 
 def check_dataset(config: ExpConfig) -> str:

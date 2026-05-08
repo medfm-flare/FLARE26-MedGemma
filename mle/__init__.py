@@ -1,1 +1,1 @@
-from mg_flare.__entry__ import __entry__
+from mle.__entry__ import __entry__

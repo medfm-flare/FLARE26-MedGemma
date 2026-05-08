@@ -22,14 +22,16 @@ template codebase by implementing the abstract functions in the engine.
 2. Verify the dataset exists at the location specified by the user. If the user does not specify, prompt the user to
    decide whether to download the dataset. Note that this path is only a local path, which SHOULD NEVER appear in the
    codebase.
-3. Read this template codebase and understand what the codebase is for.
-4. Read the instructions of the desired dataset format. If the user does not specify, search online to determine the
+3. If the user does not specify a Python interpreter to use, try finding one that has `mle` installed. If none can be
+   found, prompt the user to specify one.
+4. Read this template codebase and understand what the codebase is for.
+5. Read the instructions of the desired dataset format. If the user does not specify, search online to determine the
    most suitable format based on the context.
-5. Modify "mle/engine/preprocess.py" to implement the `preprocess` function that converts the dataset to the desired
+6. Modify "mle/engine/preprocess.py" to implement the `preprocess` function that converts the dataset to the desired
    format (if different) and applies the preprocessing transformations and analysis if applicable.
-6. Read the instructions of how to train or fine-tune the model. If the user does not specify, search online for the
+7. Read the instructions of how to train or fine-tune the model. If the user does not specify, search online for the
    official documentation of the model. If none can be found, infer the best setup based on other similar models.
-7. Modify "mle/engine/train.py" to implement the `train` function that trains the model.
-8. Read the instructions of how to evaluate the model. If the user does not specify, search online for the official
+8. Modify "mle/engine/train.py" to implement the `train` function that trains the model.
+9. Read the instructions of how to evaluate the model. If the user does not specify, search online for the official
    documentation of the dataset. If none can be found, infer the best evaluation protocol based on the dataset content.
-9. Modify "mle/engine/evaluate.py" to implement the `evaluate` function that evaluates the model.
+10. Modify "mle/engine/evaluate.py" to implement the `evaluate` function that evaluates the model.
