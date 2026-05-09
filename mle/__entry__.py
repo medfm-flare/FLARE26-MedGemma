@@ -11,7 +11,7 @@ from mle.vars import erbium_config, slurm_config
 def __entry__() -> None:
     parser = ArgumentParser(prog="mg-flare", description="MedGemma Baselines",
                             epilog="GitHub: https://github.com/ATATC/MedGemma-FLARE")
-    parser.add_argument("-n", "--name", default=None, help="Experiment name")
+    parser.add_argument("-n", "--experiment_name", default=None, help="Experiment name")
     parser.add_argument("-d", "--dataset", required=True, help="Dataset name")
     parser.add_argument("-c", "--config", choices=("slurm", "erbium"), default="erbium", help="Configuration to use")
     parser.add_argument("--suser", help="SLURM username")
@@ -39,10 +39,10 @@ def __entry__() -> None:
     ) if args.config == "erbium" else slurm_config(
         experiment_name, args.suser, args.dataset, root_dir=args.root_dir
     )
-    if args.input:
-        config._input_dir = args.input
-    if args.output:
-        config._output_dir = args.output
+    if args.input_dir:
+        config._input_dir = args.input_dir
+    if args.output_dir:
+        config._output_dir = args.output_dir
     config.initialize()
     custom_args = {}
     if args.custom_args:
