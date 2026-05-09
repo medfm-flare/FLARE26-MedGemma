@@ -12,7 +12,7 @@ requires-python = ">=3.12"
 authors = [
     { name = "Tianhao Fu", email = "terry.fu@projectneura.org" }
 ]
-dependencies = ["rich", "git+https://github.com/ProjectNeura/Erbium"]
+dependencies = ["rich", "erbium @ git+https://github.com/ProjectNeura/Erbium"]
 
 [tool.hatch.build.targets.sdist]
 only-include = ["mle"]
