@@ -1,5 +1,10 @@
 # Machine Learning Engineer
 
+![architecture](assets/arch.svg)
+
+MLE is a machine learning engineer that reproduces a paper, trains a model, or fine-tunes a model for you with a single
+prompt like: "I want to train ConvNeXt on the CIFAR-10 dataset".
+
 ## Getting Started
 
 This codebase is a template codebase for a general machine learning workflow to apply a model onto a dataset:
@@ -19,6 +24,8 @@ For example, suppose we want to fine-tune MedGemma 1.5 on the FLARE-MLLM-2D data
 > - GREEN score for report generation
 >
 > For the GREEN score computation, use the implementation in https://github.com/ATATC/GREEN.
+
+[This](https://github.com/ATATC/MedGemma-FLARE) repository is the example here.
 
 ## Usage
 

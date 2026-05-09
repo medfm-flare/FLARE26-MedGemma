@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">MLE Architecture Design</title>
+  <desc id="desc">Architecture diagram for the MLE Python package showing entrypoints, configuration, interface checks, engine functions, storage, and outputs.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f6f8fb; }
+      .title { fill: #26324d; font: 700 30px Arial, sans-serif; }
+      .subtitle { fill: #4a5872; font: 15px Arial, sans-serif; }
+      .band { fill: #ffffff; stroke: #d7deeb; stroke-width: 1.2; rx: 8; }
+      .band-title { fill: #26324d; font: 700 18px Arial, sans-serif; }
+      .box { fill: #ffffff; stroke: #7889a8; stroke-width: 1.3; rx: 7; }
+      .blue { fill: #e9f3ff; stroke: #5c8ed0; }
+      .green { fill: #e9f7ef; stroke: #52a372; }
+      .yellow { fill: #fff6df; stroke: #d2a73a; }
+      .purple { fill: #f1edff; stroke: #8b74d6; }
+      .red { fill: #fff0ef; stroke: #c96d64; }
+      .label { fill: #24304a; font: 700 16px Arial, sans-serif; }
+      .body { fill: #3e4c66; font: 13px Arial, sans-serif; }
+      .mono { fill: #24304a; font: 13px "SFMono-Regular", Consolas, monospace; }
+      .tiny { fill: #66738b; font: 12px Arial, sans-serif; }
+      .note { fill: #66738b; font: 12px Arial, sans-serif; }
+      .fail-label { fill: #24304a; font: 700 14px Arial, sans-serif; }
+      .lane { fill: #f8fafc; stroke: #dce3ef; stroke-width: 1; rx: 6; }
+      .arrow { stroke: #53627f; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .soft { stroke: #8591a8; stroke-width: 1.7; fill: none; stroke-dasharray: 6 6; marker-end: url(#softhead); }
+      .ok { stroke: #3e8158; stroke-width: 2; fill: none; marker-end: url(#okhead); }
+      .fail { stroke: #aa514b; stroke-width: 2; fill: none; marker-end: url(#failhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 Z" fill="#53627f"/>
+    </marker>
+    <marker id="softhead" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 Z" fill="#8591a8"/>
+    </marker>
+    <marker id="okhead" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 Z" fill="#3e8158"/>
+    </marker>
+    <marker id="failhead" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <path d="M0,0 L10,4 L0,8 Z" fill="#aa514b"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1200" height="1200"/>
+  <text class="title" x="60" y="56">MLE Architecture Design</text>
+  <text class="subtitle" x="60" y="84">Template package for a machine learning workflow: preprocess -> train -> evaluate.</text>
+
+  <rect class="band" x="50" y="115" width="1100" height="175"/>
+  <text class="band-title" x="75" y="147">1. Invocation</text>
+
+  <rect class="box blue" x="85" y="178" width="190" height="72"/>
+  <text class="label" x="110" y="204">User or scheduler</text>
+  <text class="mono" x="110" y="228">python -m mle ...</text>
+
+  <rect class="box" x="335" y="165" width="220" height="98"/>
+  <text class="label" x="360" y="193">Entrypoints</text>
+  <text class="mono" x="360" y="217">mle/__main__.py</text>
+  <text class="mono" x="360" y="238">mle/__entry__.py</text>
+
+  <rect class="box yellow" x="615" y="165" width="220" height="98"/>
+  <text class="label" x="640" y="193">Argument parser</text>
+  <text class="body" x="640" y="217">dataset, config, system</text>
+  <text class="body" x="640" y="238">paths, WandB, custom args</text>
+
+  <rect class="box purple" x="895" y="165" width="205" height="98"/>
+  <text class="label" x="920" y="193">Optional overrides</text>
+  <text class="mono" x="920" y="217">*.json</text>
+  <text class="mono" x="920" y="238">*.yaml</text>
+
+  <path class="arrow" d="M275 214 H335"/>
+  <path class="arrow" d="M555 214 H615"/>
+  <path class="soft" d="M835 214 H895"/>
+
+  <rect class="band" x="50" y="325" width="1100" height="205"/>
+  <text class="band-title" x="75" y="357">2. Configuration and storage</text>
+
+  <rect class="box green" x="85" y="390" width="220" height="98"/>
+  <text class="label" x="110" y="418">Config factory</text>
+  <text class="mono" x="110" y="442">erbium_config(...)</text>
+  <text class="mono" x="110" y="463">slurm_config(...)</text>
+
+  <rect class="box" x="365" y="374" width="230" height="130"/>
+  <text class="label" x="390" y="402">ExpConfig</text>
+  <text class="mono" x="390" y="426">experiment_name</text>
+  <text class="mono" x="390" y="447">root_dir</text>
+  <text class="mono" x="390" y="468">dataset_name</text>
+  <text class="mono" x="390" y="489">input_dir / output_dir</text>
+
+  <rect class="box yellow" x="655" y="374" width="210" height="130"/>
+  <text class="label" x="680" y="402">initialize()</text>
+  <text class="body" x="680" y="426">verify root/input/data</text>
+  <text class="body" x="680" y="447">create output dir</text>
+  <text class="body" x="680" y="468">fail early on bad paths</text>
+
+  <rect class="box blue" x="925" y="374" width="185" height="130"/>
+  <text class="label" x="950" y="402">Storage layout</text>
+  <text class="mono" x="950" y="426">input/{dataset}</text>
+  <text class="mono" x="950" y="447">output/</text>
+  <text class="mono" x="950" y="468">Preprocessed-*</text>
+  <text class="body" x="950" y="489">Erbium or SLURM root</text>
+
+  <path class="arrow" d="M725 263 V307 C725 318 715 325 700 325"/>
+  <path class="arrow" d="M305 439 H365"/>
+  <path class="arrow" d="M595 439 H655"/>
+  <path class="arrow" d="M865 439 H925"/>
+
+  <rect class="band" x="50" y="565" width="1100" height="315"/>
+  <text class="band-title" x="75" y="597">3. Interface gate and engine execution</text>
+
+  <rect class="box purple" x="85" y="635" width="220" height="120"/>
+  <text class="label" x="110" y="663">Interface wrappers</text>
+  <text class="mono" x="110" y="687">preprocess()</text>
+  <text class="mono" x="110" y="708">train()</text>
+  <text class="mono" x="110" y="729">evaluate()</text>
+
+  <rect class="box yellow" x="365" y="618" width="250" height="155"/>
+  <text class="label" x="390" y="646">Environment check</text>
+  <text class="mono" x="390" y="670">check_dataset()</text>
+  <text class="mono" x="390" y="691">check_preprocessed_dataset()</text>
+  <text class="mono" x="390" y="712">get_all_gpu_info()</text>
+  <text class="mono" x="390" y="733">torch.version.cuda</text>
+
+  <rect class="box green" x="695" y="604" width="230" height="182"/>
+  <text class="label" x="720" y="632">Engine templates</text>
+  <rect class="lane" x="720" y="654" width="180" height="30"/>
+  <text class="mono" x="735" y="674">preprocess.py</text>
+  <rect class="lane" x="720" y="696" width="180" height="30"/>
+  <text class="mono" x="735" y="716">train.py</text>
+  <rect class="lane" x="720" y="738" width="180" height="30"/>
+  <text class="mono" x="735" y="758">evaluate.py</text>
+
+  <rect class="box blue" x="985" y="604" width="125" height="80"/>
+  <text class="label" x="1006" y="632">Artifacts</text>
+  <text class="body" x="1006" y="656">data</text>
+  <text class="body" x="1006" y="676">models</text>
+
+  <rect class="box" x="985" y="706" width="125" height="80"/>
+  <text class="label" x="1006" y="734">Logs</text>
+  <text class="body" x="1006" y="758">Rich console</text>
+  <text class="body" x="1006" y="778">WandB option</text>
+
+  <rect class="box red" x="340" y="808" width="320" height="46"/>
+  <text class="fail-label" x="380" y="835">Fail fast if prerequisites fail</text>
+
+  <path class="arrow" d="M480 504 V548 C480 558 470 565 455 565"/>
+  <path class="arrow" d="M305 695 H365"/>
+  <path class="ok" d="M615 695 H695"/>
+  <path class="fail" d="M490 773 V808"/>
+  <path class="arrow" d="M925 644 H985"/>
+  <path class="soft" d="M925 746 H985"/>
+
+  <text class="note" x="88" y="806">preprocess requires raw dataset</text>
+  <text class="note" x="88" y="828">train/evaluate require</text>
+  <text class="note" x="88" y="848">preprocessed data and CUDA</text>
+</svg>
