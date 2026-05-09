@@ -25,8 +25,8 @@ def print_environment_check_results(results: dict[str, Any], *, console: Console
     table.add_column("Memory Utilization (%)", justify="center", style="green")
     for info in results["gpus"].values():
         table.add_row(
-            f"{info.name} ({info.device_id})", info.total_memory_gb, info.utilization_percent,
-            info.memory_utilization_percent
+            f"{info.name} ({info.device_id})", f"{info.total_memory_gb:.1f}", f"{info.utilization_percent:.2f}",
+            f"{info.memory_utilization_percent:.2f}"
         )
     console.print(table)
     console.print(f"Dataset availability: {results["dataset"]}")
