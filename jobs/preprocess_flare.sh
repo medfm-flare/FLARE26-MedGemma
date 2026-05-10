@@ -19,9 +19,9 @@ DATASET_NAME="${DATASET_NAME:-FLARE-MLLM-2D}"
 EXPERIMENT_NAME="${EXPERIMENT_NAME:-flare-medgemma}"
 
 # DATA_ROOT should contain $DATASET_NAME as a child directory.
-DATA_ROOT="${DATA_ROOT:-/project/rrg-jma/${USERNAME}/datasets}"
-OUTPUT_ROOT="${OUTPUT_ROOT:-/project/rrg-jma/${USERNAME}/medgemma-flare-2d-output}"
-SCRATCH_BASE="${SCRATCH_BASE:-/scratch/${USERNAME}/medgemma-flare-2d}"
+DATA_ROOT="${DATA_ROOT:-/scratch/${USERNAME}/input}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-/scratch/${USERNAME}/output}"
+SCRATCH_BASE="${SCRATCH_BASE:-/scratch/${USERNAME}/app}"
 
 cd "$PROJECT_ROOT"
 mkdir -p logs logs/configs "$OUTPUT_ROOT" "$SCRATCH_BASE"
@@ -75,7 +75,7 @@ echo "---"
 
 # Optional environment activation:
 # export CONDA_ENV=medgemma
-# export VENV_PATH=/project/rrg-jma/${USERNAME}/envs/medgemma
+export VENV_PATH=/scratch/atatc/venv
 if [[ -n "${CONDA_ENV:-}" ]]; then
   source "$(conda info --base)/etc/profile.d/conda.sh"
   conda activate "$CONDA_ENV"
