@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=flare-preprocess
-#SBATCH --account=rrg-jma
+#SBATCH --account=def-jma-ab
 #SBATCH --cpus-per-task=2
-#SBATCH --mem=16G
+#SBATCH --mem=8G
 #SBATCH --time=02:00:00
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
