@@ -1,9 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=flare-preprocess
-#SBATCH --partition=gpu
 #SBATCH --account=rrg-jma
-#SBATCH --constraint=nvidia_h100_80gb_hbm3_1g.10gb
-#SBATCH --gres=gpu:1
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=16G
 #SBATCH --time=02:00:00
@@ -85,8 +82,33 @@ fi
 
 export HF_HOME="${HF_HOME:-${SCRATCH_BASE}/hf_cache}"
 export HF_DATASETS_CACHE="${HF_DATASETS_CACHE:-${SCRATCH_BASE}/hf_datasets}"
+export WANDB_DIR="${WANDB_DIR:-${OUTPUT_ROOT}/wandb}"
+export WANDB_MODE=online
+export WANDB_PROJECT="${WANDB_PROJECT:-medgemma15-flare-mllm-2d}"
+unset WANDB_DISABLED
 export TMPDIR="${TMPDIR:-${SCRATCH_BASE}/tmp/${SLURM_JOB_ID}}"
-mkdir -p "$HF_HOME" "$HF_DATASETS_CACHE" "$TMPDIR"
+mkdir -p "$HF_HOME" "$HF_DATASETS_CACHE" "$WANDB_DIR" "$TMPDIR"
+
+if ! python - <<'PY'
+import netrc
+import os
+import sys
+
+if os.environ.get("WANDB_API_KEY"):
+    sys.exit(0)
+
+netrc_path = os.environ.get("NETRC") or os.path.expanduser("~/.netrc")
+try:
+    auth = netrc.netrc(netrc_path).authenticators("api.wandb.ai")
+except (FileNotFoundError, netrc.NetrcParseError):
+    auth = None
+
+sys.exit(0 if auth and auth[2] else 1)
+PY
+then
+  echo "WandB is not authenticated. Run 'wandb login' on the cluster or export WANDB_API_KEY before submitting." >&2
+  exit 1
+fi
 
 CONFIG_PATH="logs/configs/preprocess_${SLURM_JOB_ID}.yaml"
 cat > "$CONFIG_PATH" <<'YAML'
@@ -111,6 +133,7 @@ python -m mle \
   --input_dir "$DATA_ROOT" \
   --output_dir "$OUTPUT_ROOT" \
   --custom_args "$CONFIG_PATH" \
+  --wandb \
   preprocess
 
 echo "---"
