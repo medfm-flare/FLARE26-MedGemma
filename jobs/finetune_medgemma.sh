@@ -1,9 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=medgemma-finetune
-#SBATCH --partition=gpu
 #SBATCH --account=rrg-jma
-#SBATCH --constraint=nvidia_h100_80gb_hbm3_3g.40gb
-#SBATCH --gres=gpu:1
+#SBATCH --gpus-per-node=nvidia_h100_80gb_hbm3_3g.40gb:1
 #SBATCH --cpus-per-task=6
 #SBATCH --mem=64G
 #SBATCH --time=08:00:00

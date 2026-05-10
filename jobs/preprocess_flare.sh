@@ -1,9 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=flare-preprocess
-#SBATCH --partition=gpu
 #SBATCH --account=rrg-jma
-#SBATCH --constraint=nvidia_h100_80gb_hbm3_1g.10gb
-#SBATCH --gres=nvidia_h100_80gb_hbm3_1g.10gb:1
+#SBATCH --gpus-per-node=nvidia_h100_80gb_hbm3_1g.10gb:1
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=8G
 #SBATCH --time=02:00:00
