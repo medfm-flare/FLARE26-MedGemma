@@ -53,7 +53,7 @@ SEFF
   )
   sbatch \
     --job-name="${SLURM_JOB_NAME:-job}-seff" \
-    --account=rrg-jma \
+    --account=def-jma-ab \
     --time=00:05:00 \
     --cpus-per-task=1 \
     --mem=1G \
