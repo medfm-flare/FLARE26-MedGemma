@@ -40,7 +40,7 @@ echo "---"
 
 # Optional environment activation. Set one of these before sbatch if needed:
 #   export CONDA_ENV=medgemma
-#   export VENV_PATH=/project/rrg-jma/atatc/envs/medgemma
+export VENV_PATH=/scratch/atatc/venv
 if [[ -n "${CONDA_ENV:-}" ]]; then
   source "$(conda info --base)/etc/profile.d/conda.sh"
   conda activate "$CONDA_ENV"
