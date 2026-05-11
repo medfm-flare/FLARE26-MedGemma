@@ -115,6 +115,13 @@ cd /scratch/${USER}/app
 pip install -e .
 ```
 
+#### Run Smoke Tests to Determine the Required Resources
+
+```shell
+salloc --account=${SACCOUNT} --gres=gpu:h100:1 --mem=32G --cpus-per-task=8 --time=1:00:00
+python -m mle -c slurm -suser ${USER} --smoke_test ...
+```
+
 #### Run Your Modified Codebase
 
 You can use [DRA-config](https://github.com/ATATC/dra-config) skills to generate the job script or the following
