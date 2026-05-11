@@ -142,16 +142,17 @@ def train(
         console.print(f"Loaded {len(train_dataset)} training row(s)" + (f" and {len(eval_dataset)} validation row(s)" if eval_dataset else ""))
 
         dtype = choose_dtype()
-        attn_implementation = choose_attention_backend(str(kwargs.get("attn_implementation", "auto")))
+        attn_implementations = choose_attention_backends(str(kwargs.get("attn_implementation", "auto")))
         quant_config = make_quant_config(bool(kwargs.get("load_in_4bit", True)), dtype)
 
-        console.print(f"Loading {model_name_or_path} with attention={attn_implementation}")
-        model = AutoModelForImageTextToText.from_pretrained(
+        console.print(f"Loading {model_name_or_path} with attention={attn_label(attn_implementations[0])}")
+        model = load_model_with_attention_fallback(
             model_name_or_path,
+            attn_implementations,
+            console,
             torch_dtype=dtype,
             device_map=None if torch.cuda.is_available() else "cpu",
             quantization_config=quant_config,
-            attn_implementation=attn_implementation,
             trust_remote_code=True,
         )
         processor = AutoProcessor.from_pretrained(model_name_or_path, trust_remote_code=True, use_fast=True)
@@ -355,21 +356,52 @@ def choose_dtype():
     return torch.float32
 
 
-def choose_attention_backend(requested: str) -> str:
+def choose_attention_backends(requested: str) -> list[str | None]:
     requested = requested.strip().lower()
     if requested == "auto":
-        try:
-            import flash_attn  # noqa: F401
-            return "flash_attention_2"
-        except Exception:
-            return "sdpa"
+        return ["sdpa", "eager", None]
+    if requested in {"default", "none", "transformers-default"}:
+        return [None]
     if requested == "flash_attention_2":
         try:
             import flash_attn  # noqa: F401
-            return "flash_attention_2"
+            return ["flash_attention_2", "sdpa", "eager", None]
         except Exception:
-            return "sdpa"
-    return requested
+            return ["sdpa", "eager", None]
+    return unique_attention_backends([requested, "sdpa", "eager", None])
+
+
+def unique_attention_backends(backends: Sequence[str | None]) -> list[str | None]:
+    out = []
+    for backend in backends:
+        if backend not in out:
+            out.append(backend)
+    return out
+
+
+def attn_label(attn_implementation: str | None) -> str:
+    return attn_implementation or "transformers-default"
+
+
+def load_model_with_attention_fallback(model_name_or_path: str, attn_implementations: Sequence[str | None], console: Console, **kwargs):
+    last_error: Exception | None = None
+    for index, attn_implementation in enumerate(attn_implementations):
+        model_kwargs = dict(kwargs)
+        if attn_implementation is not None:
+            model_kwargs["attn_implementation"] = attn_implementation
+        try:
+            if index > 0:
+                console.print(f"Retrying model load with attention={attn_label(attn_implementation)}")
+            return AutoModelForImageTextToText.from_pretrained(model_name_or_path, **model_kwargs)
+        except ValueError as exc:
+            last_error = exc
+            message = str(exc)
+            if "attn" not in message.lower() and "attention" not in message.lower():
+                raise
+            console.print(f"Attention backend {attn_label(attn_implementation)} is unsupported here: {message}")
+    if last_error is not None:
+        raise last_error
+    raise RuntimeError("No attention backends were provided for model loading.")
 
 
 def make_quant_config(load_in_4bit: bool, dtype: Any):
