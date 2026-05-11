@@ -113,152 +113,148 @@ def train(
     seed = int(kwargs.get("seed", 42))
     seed_everything(seed)
     configure_wandb(config, output_dir, use_wandb, kwargs)
-    try:
-        model_name_or_path = str(kwargs.get("model_name_or_path", MODEL_ID))
-        image_size = int(kwargs.get("image_size", 512 if smoke_test else 896))
-        resize_mode = str(kwargs.get("resize_mode", "square"))
-        max_images_per_sample = int(kwargs.get("max_images_per_sample", 1))
-        max_length = int(kwargs.get("max_length", 0))
-        max_train_samples = optional_int(kwargs.get("max_train_samples", 8 if smoke_test else None))
-        max_eval_samples = optional_int(kwargs.get("max_eval_samples", 4 if smoke_test else 256))
-        per_device_eval_batch_size = int(kwargs.get("per_device_eval_batch_size", 1))
-        gradient_accumulation_steps = int(kwargs.get("gradient_accumulation_steps", 1 if smoke_test else 16))
-        max_steps = int(kwargs.get("max_steps", 2 if smoke_test else -1))
-        if smoke_test:
-            console.print("Smoke test mode: limiting training samples, steps, and evaluation workload.")
+    model_name_or_path = str(kwargs.get("model_name_or_path", MODEL_ID))
+    image_size = int(kwargs.get("image_size", 512 if smoke_test else 896))
+    resize_mode = str(kwargs.get("resize_mode", "square"))
+    max_images_per_sample = int(kwargs.get("max_images_per_sample", 1))
+    max_length = int(kwargs.get("max_length", 0))
+    max_train_samples = optional_int(kwargs.get("max_train_samples", 8 if smoke_test else None))
+    max_eval_samples = optional_int(kwargs.get("max_eval_samples", 4 if smoke_test else 256))
+    per_device_eval_batch_size = int(kwargs.get("per_device_eval_batch_size", 1))
+    gradient_accumulation_steps = int(kwargs.get("gradient_accumulation_steps", 1 if smoke_test else 16))
+    max_steps = int(kwargs.get("max_steps", 2 if smoke_test else -1))
+    if smoke_test:
+        console.print("Smoke test mode: limiting training samples, steps, and evaluation workload.")
 
-        console.print(f"Loading converted FLARE-MLLM-2D data from {config.preprocessed_dataset_dir}")
-        train_dataset, eval_dataset = load_splits(Path(config.preprocessed_dataset_dir), max_train_samples,
-                                                  max_eval_samples)
-        console.print(f"Loaded {len(train_dataset)} training row(s)" + (
-            f" and {len(eval_dataset)} validation row(s)" if eval_dataset else ""))
+    console.print(f"Loading converted FLARE-MLLM-2D data from {config.preprocessed_dataset_dir}")
+    train_dataset, eval_dataset = load_splits(Path(config.preprocessed_dataset_dir), max_train_samples,
+                                              max_eval_samples)
+    console.print(f"Loaded {len(train_dataset)} training row(s)" + (
+        f" and {len(eval_dataset)} validation row(s)" if eval_dataset else ""))
 
-        dtype = choose_dtype()
-        attn_implementations = choose_attention_backends(str(kwargs.get("attn_implementation", "auto")))
-        quant_config = make_quant_config(bool(kwargs.get("load_in_4bit", True)), dtype)
+    dtype = choose_dtype()
+    attn_implementations = choose_attention_backends(str(kwargs.get("attn_implementation", "auto")))
+    quant_config = make_quant_config(bool(kwargs.get("load_in_4bit", True)), dtype)
 
-        console.print(f"Loading {model_name_or_path} with attention={attn_label(attn_implementations[0])}")
-        model = load_model_with_attention_fallback(
-            model_name_or_path,
-            attn_implementations,
-            console,
-            torch_dtype=dtype,
-            device_map=None if torch.cuda.is_available() else "cpu",
-            quantization_config=quant_config,
-            trust_remote_code=True,
-        )
-        processor = AutoProcessor.from_pretrained(model_name_or_path, trust_remote_code=True, use_fast=True)
-        processor.tokenizer.padding_side = "right"
-        if processor.tokenizer.pad_token_id is None:
-            processor.tokenizer.pad_token = processor.tokenizer.eos_token
+    console.print(f"Loading {model_name_or_path} with attention={attn_label(attn_implementations[0])}")
+    model = load_model_with_attention_fallback(
+        model_name_or_path,
+        attn_implementations,
+        console,
+        torch_dtype=dtype,
+        device_map=None if torch.cuda.is_available() else "cpu",
+        quantization_config=quant_config,
+        trust_remote_code=True,
+    )
+    processor = AutoProcessor.from_pretrained(model_name_or_path, trust_remote_code=True, use_fast=True)
+    processor.tokenizer.padding_side = "right"
+    if processor.tokenizer.pad_token_id is None:
+        processor.tokenizer.pad_token = processor.tokenizer.eos_token
 
-        if quant_config is not None:
-            model = prepare_model_for_kbit_training(model)
-        model.config.use_cache = False
+    if quant_config is not None:
+        model = prepare_model_for_kbit_training(model)
+    model.config.use_cache = False
 
-        gradient_checkpointing = bool(kwargs.get("gradient_checkpointing", True))
-        if gradient_checkpointing:
-            try:
-                model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
-            except TypeError:
-                model.gradient_checkpointing_enable()
+    gradient_checkpointing = bool(kwargs.get("gradient_checkpointing", True))
+    if gradient_checkpointing:
+        try:
+            model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
+        except TypeError:
+            model.gradient_checkpointing_enable()
 
-        target_modules: Any = kwargs.get("target_modules", "all-linear")
-        if isinstance(target_modules, str) and "," in target_modules:
-            target_modules = [item.strip() for item in target_modules.split(",") if item.strip()]
-        modules_to_save = split_csv(kwargs.get("modules_to_save", ""))
-        peft_config = LoraConfig(
-            r=int(kwargs.get("lora_rank", 8 if smoke_test else 16)),
-            lora_alpha=int(kwargs.get("lora_alpha", 8 if smoke_test else 16)),
-            lora_dropout=float(kwargs.get("lora_dropout", 0.05)),
-            bias="none",
-            target_modules=target_modules,
-            task_type="CAUSAL_LM",
-            modules_to_save=modules_to_save or None,
-        )
+    target_modules: Any = kwargs.get("target_modules", "all-linear")
+    if isinstance(target_modules, str) and "," in target_modules:
+        target_modules = [item.strip() for item in target_modules.split(",") if item.strip()]
+    modules_to_save = split_csv(kwargs.get("modules_to_save", ""))
+    peft_config = LoraConfig(
+        r=int(kwargs.get("lora_rank", 8 if smoke_test else 16)),
+        lora_alpha=int(kwargs.get("lora_alpha", 8 if smoke_test else 16)),
+        lora_dropout=float(kwargs.get("lora_dropout", 0.05)),
+        bias="none",
+        target_modules=target_modules,
+        task_type="CAUSAL_LM",
+        modules_to_save=modules_to_save or None,
+    )
 
-        collator = ImageSFTCollator(
-            processor=processor,
-            image_size=image_size,
-            resize_mode=resize_mode,
-            max_images_per_sample=max_images_per_sample,
-            max_length=max_length if max_length > 0 else None,
-            mask_prompt_tokens=bool(kwargs.get("mask_prompt_tokens", True)),
-        )
+    collator = ImageSFTCollator(
+        processor=processor,
+        image_size=image_size,
+        resize_mode=resize_mode,
+        max_images_per_sample=max_images_per_sample,
+        max_length=max_length if max_length > 0 else None,
+        mask_prompt_tokens=bool(kwargs.get("mask_prompt_tokens", True)),
+    )
 
-        eval_strategy = "steps" if eval_dataset is not None else "no"
-        early_stopping_patience = int(kwargs.get("early_stopping_patience", 0))
-        use_early_stopping = eval_dataset is not None and early_stopping_patience > 0
-        if use_early_stopping and EarlyStoppingCallback is None:
-            raise RuntimeError("EarlyStoppingCallback is unavailable; install or upgrade transformers.")
+    eval_strategy = "steps" if eval_dataset is not None else "no"
+    early_stopping_patience = int(kwargs.get("early_stopping_patience", 0))
+    use_early_stopping = eval_dataset is not None and early_stopping_patience > 0
+    if use_early_stopping and EarlyStoppingCallback is None:
+        raise RuntimeError("EarlyStoppingCallback is unavailable; install or upgrade transformers.")
 
-        training_args = make_sft_config_compat(
-            output_dir=str(output_dir),
-            run_name=str(kwargs.get("run_name", config.experiment_name)),
-            num_train_epochs=float(num_epochs),
-            max_steps=max_steps,
-            per_device_train_batch_size=int(kwargs.get("per_device_train_batch_size", batch_size)),
-            per_device_eval_batch_size=per_device_eval_batch_size,
-            gradient_accumulation_steps=gradient_accumulation_steps,
-            learning_rate=float(learning_rate),
-            weight_decay=float(kwargs.get("weight_decay", 0.0)),
-            warmup_ratio=float(kwargs.get("warmup_ratio", 0.03)),
-            lr_scheduler_type=str(kwargs.get("lr_scheduler_type", "linear")),
-            optim=str(kwargs.get("optim", "paged_adamw_8bit" if quant_config is not None else "adamw_torch_fused")),
-            bf16=(dtype == torch.bfloat16),
-            fp16=(dtype == torch.float16),
-            max_grad_norm=float(kwargs.get("max_grad_norm", 0.3)),
-            logging_steps=int(kwargs.get("logging_steps", 1 if smoke_test else 10)),
-            save_strategy="steps",
-            save_steps=int(kwargs.get("save_steps", 100000 if smoke_test else 200)),
-            save_total_limit=int(kwargs.get("save_total_limit", 1 if smoke_test else 3)),
-            eval_strategy=eval_strategy,
-            eval_steps=int(kwargs.get("eval_steps", 100000 if smoke_test else 200)),
-            load_best_model_at_end=use_early_stopping,
-            metric_for_best_model="eval_loss" if use_early_stopping else None,
-            greater_is_better=False if use_early_stopping else None,
-            gradient_checkpointing=gradient_checkpointing,
-            gradient_checkpointing_kwargs={"use_reentrant": False},
-            remove_unused_columns=False,
-            dataset_kwargs={"skip_prepare_dataset": True},
-            label_names=["labels"],
-            report_to="wandb" if use_wandb else "none",
-            push_to_hub=bool(kwargs.get("push_to_hub", False)),
-            hub_model_id=kwargs.get("hub_model_id"),
-            dataloader_num_workers=int(kwargs.get("dataloader_num_workers", 0 if smoke_test else 0)),
-            dataloader_pin_memory=bool(kwargs.get("dataloader_pin_memory", False)),
-            group_by_length=False,
-            packing=False,
-            max_seq_length=max_length if max_length > 0 else None,
-        )
+    training_args = make_sft_config_compat(
+        output_dir=str(output_dir),
+        run_name=str(kwargs.get("run_name", config.experiment_name)),
+        num_train_epochs=float(num_epochs),
+        max_steps=max_steps,
+        per_device_train_batch_size=int(kwargs.get("per_device_train_batch_size", batch_size)),
+        per_device_eval_batch_size=per_device_eval_batch_size,
+        gradient_accumulation_steps=gradient_accumulation_steps,
+        learning_rate=float(learning_rate),
+        weight_decay=float(kwargs.get("weight_decay", 0.0)),
+        warmup_ratio=float(kwargs.get("warmup_ratio", 0.03)),
+        lr_scheduler_type=str(kwargs.get("lr_scheduler_type", "linear")),
+        optim=str(kwargs.get("optim", "paged_adamw_8bit" if quant_config is not None else "adamw_torch_fused")),
+        bf16=(dtype == torch.bfloat16),
+        fp16=(dtype == torch.float16),
+        max_grad_norm=float(kwargs.get("max_grad_norm", 0.3)),
+        logging_steps=int(kwargs.get("logging_steps", 1 if smoke_test else 10)),
+        save_strategy="steps",
+        save_steps=int(kwargs.get("save_steps", 100000 if smoke_test else 200)),
+        save_total_limit=int(kwargs.get("save_total_limit", 1 if smoke_test else 3)),
+        eval_strategy=eval_strategy,
+        eval_steps=int(kwargs.get("eval_steps", 100000 if smoke_test else 200)),
+        load_best_model_at_end=use_early_stopping,
+        metric_for_best_model="eval_loss" if use_early_stopping else None,
+        greater_is_better=False if use_early_stopping else None,
+        gradient_checkpointing=gradient_checkpointing,
+        gradient_checkpointing_kwargs={"use_reentrant": False},
+        remove_unused_columns=False,
+        dataset_kwargs={"skip_prepare_dataset": True},
+        label_names=["labels"],
+        report_to="wandb" if use_wandb else "none",
+        push_to_hub=bool(kwargs.get("push_to_hub", False)),
+        hub_model_id=kwargs.get("hub_model_id"),
+        dataloader_num_workers=int(kwargs.get("dataloader_num_workers", 0 if smoke_test else 0)),
+        dataloader_pin_memory=bool(kwargs.get("dataloader_pin_memory", False)),
+        group_by_length=False,
+        packing=False,
+        max_seq_length=max_length if max_length > 0 else None,
+    )
 
-        callbacks = []
-        if use_early_stopping:
-            callbacks.append(EarlyStoppingCallback(
-                early_stopping_patience=early_stopping_patience,
-                early_stopping_threshold=float(kwargs.get("early_stopping_threshold", 0.0)),
-            ))
+    callbacks = []
+    if use_early_stopping:
+        callbacks.append(EarlyStoppingCallback(
+            early_stopping_patience=early_stopping_patience,
+            early_stopping_threshold=float(kwargs.get("early_stopping_threshold", 0.0)),
+        ))
 
-        trainer = make_sft_trainer_compat(
-            model=model,
-            args=training_args,
-            train_dataset=train_dataset,
-            eval_dataset=eval_dataset,
-            peft_config=peft_config,
-            processing_class=processor,
-            data_collator=collator,
-            callbacks=callbacks,
-        )
+    trainer = make_sft_trainer_compat(
+        model=model,
+        args=training_args,
+        train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
+        peft_config=peft_config,
+        processing_class=processor,
+        data_collator=collator,
+        callbacks=callbacks,
+    )
 
-        console.print("Starting MedGemma LoRA fine-tuning")
-        trainer.train(resume_from_checkpoint=kwargs.get("resume_from_checkpoint"))
-        final_dir = output_dir / "final"
-        trainer.save_model(str(final_dir))
-        processor.save_pretrained(str(final_dir))
-        console.print(f"Saved final adapter and processor to {final_dir}")
-    finally:
-        if monitor is not None:
-            stop_resource_monitor(monitor, console)
+    console.print("Starting MedGemma LoRA fine-tuning")
+    trainer.train(resume_from_checkpoint=kwargs.get("resume_from_checkpoint"))
+    final_dir = output_dir / "final"
+    trainer.save_model(str(final_dir))
+    processor.save_pretrained(str(final_dir))
+    console.print(f"Saved final adapter and processor to {final_dir}")
 
 
 def dependency_gaps() -> list[str]:
@@ -493,17 +489,6 @@ def load_splits(data_dir: Path, max_train_samples: int | None, max_eval_samples:
     if eval_dataset is not None and max_eval_samples:
         eval_dataset = eval_dataset.select(range(min(max_eval_samples, len(eval_dataset))))
     return train_dataset, eval_dataset
-
-
-def stop_resource_monitor(monitor: Any, console: Console) -> None:
-    for method_name in ("stop", "close", "terminate", "shutdown"):
-        method = getattr(monitor, method_name, None)
-        if callable(method):
-            try:
-                method()
-            except Exception as exc:  # pragma: no cover - depends on Erbium monitor implementation
-                console.print(f"Warning: failed to stop resource monitor with {method_name}(): {exc}")
-            return
 
 
 def get_image_paths(row: dict[str, Any]) -> list[str]:
