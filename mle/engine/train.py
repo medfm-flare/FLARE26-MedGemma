@@ -6,9 +6,8 @@ import os
 import random
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Sequence
-
 from rich.console import Console
+from typing import Any, Sequence
 
 from mle.vars import ExpConfig
 
@@ -49,12 +48,6 @@ except Exception:  # pragma: no cover
     SFTConfig = None
     SFTTrainer = None
 
-try:
-    from erbium.api import ResourceMonitor
-except Exception:  # pragma: no cover
-    ResourceMonitor = None
-
-
 # these constants MUST NOT be removed but may be modified
 DEFAULT_NUM_EPOCHS: int = 1
 DEFAULT_BATCH_SIZE: int = 1
@@ -81,15 +74,15 @@ TASK_INSTRUCTIONS = {
 
 
 def train(
-    config: ExpConfig,
-    num_epochs: int,
-    batch_size: int,
-    learning_rate: float,
-    use_wandb: bool,
-    smoke_test: bool,
-    *,
-    console: Console = Console(),
-    **kwargs,
+        config: ExpConfig,
+        num_epochs: int,
+        batch_size: int,
+        learning_rate: float,
+        use_wandb: bool,
+        smoke_test: bool,
+        *,
+        console: Console = Console(),
+        **kwargs,
 ) -> None:
     """
     This is a template entrypoint for training. You MUST NOT change its signature, but you may add functions and classes
@@ -111,18 +104,15 @@ def train(
     if missing:
         raise RuntimeError("Missing training dependencies: " + ", ".join(missing))
     if not torch.cuda.is_available() and not bool(kwargs.get("allow_cpu", False)):
-        raise RuntimeError("CUDA is required for MedGemma fine-tuning. Use a Slurm GPU job or pass allow_cpu=true for tiny dry runs.")
+        raise RuntimeError(
+            "CUDA is required for MedGemma fine-tuning. Use a Slurm GPU job or pass allow_cpu=true for tiny dry runs.")
 
-    output_dir = Path(kwargs.get("model_output_dir") or kwargs.get("output_dir") or Path(config.output_dir) / f"{config.experiment_name}-medgemma15-lora")
+    output_dir = Path(kwargs.get("model_output_dir") or kwargs.get("output_dir") or Path(
+        config.output_dir) / f"{config.experiment_name}-medgemma15-lora")
     output_dir.mkdir(parents=True, exist_ok=True)
     seed = int(kwargs.get("seed", 42))
     seed_everything(seed)
     configure_wandb(config, output_dir, use_wandb, kwargs)
-
-    monitor = ResourceMonitor(str(output_dir)) if ResourceMonitor is not None and bool(kwargs.get("resource_monitor", True)) else None
-    if monitor is not None:
-        monitor.start()
-
     try:
         model_name_or_path = str(kwargs.get("model_name_or_path", MODEL_ID))
         image_size = int(kwargs.get("image_size", 512 if smoke_test else 896))
@@ -138,8 +128,10 @@ def train(
             console.print("Smoke test mode: limiting training samples, steps, and evaluation workload.")
 
         console.print(f"Loading converted FLARE-MLLM-2D data from {config.preprocessed_dataset_dir}")
-        train_dataset, eval_dataset = load_splits(Path(config.preprocessed_dataset_dir), max_train_samples, max_eval_samples)
-        console.print(f"Loaded {len(train_dataset)} training row(s)" + (f" and {len(eval_dataset)} validation row(s)" if eval_dataset else ""))
+        train_dataset, eval_dataset = load_splits(Path(config.preprocessed_dataset_dir), max_train_samples,
+                                                  max_eval_samples)
+        console.print(f"Loaded {len(train_dataset)} training row(s)" + (
+            f" and {len(eval_dataset)} validation row(s)" if eval_dataset else ""))
 
         dtype = choose_dtype()
         attn_implementations = choose_attention_backends(str(kwargs.get("attn_implementation", "auto")))
@@ -313,7 +305,8 @@ def configure_wandb(config: ExpConfig, output_dir: Path, use_wandb: bool, kwargs
         os.environ.setdefault("WANDB_DIR", str(output_dir / "wandb"))
         os.environ.setdefault("WANDB_PROJECT", str(kwargs.get("wandb_project", "medgemma15-flare-mllm-2d")))
         os.environ.setdefault("WANDB_RUN_NAME", str(kwargs.get("wandb_run_name", config.experiment_name)))
-        for env_name, key in (("WANDB_ENTITY", "wandb_entity"), ("WANDB_MODE", "wandb_mode"), ("WANDB_TAGS", "wandb_tags")):
+        for env_name, key in (("WANDB_ENTITY", "wandb_entity"), ("WANDB_MODE", "wandb_mode"),
+                              ("WANDB_TAGS", "wandb_tags")):
             if kwargs.get(key):
                 os.environ.setdefault(env_name, str(kwargs[key]))
         os.environ.setdefault("WANDB_LOG_MODEL", str(kwargs.get("wandb_log_model", "checkpoint")))
@@ -383,7 +376,8 @@ def attn_label(attn_implementation: str | None) -> str:
     return attn_implementation or "transformers-default"
 
 
-def load_model_with_attention_fallback(model_name_or_path: str, attn_implementations: Sequence[str | None], console: Console, **kwargs):
+def load_model_with_attention_fallback(model_name_or_path: str, attn_implementations: Sequence[str | None],
+                                       console: Console, **kwargs):
     last_error: Exception | None = None
     for index, attn_implementation in enumerate(attn_implementations):
         model_kwargs = dict(kwargs)
@@ -472,7 +466,8 @@ def arrow_safe_records(rows: Sequence[dict[str, Any]]) -> list[dict[str, str]]:
     return [{key: arrow_safe_value(row.get(key)) for key in keys} for row in rows]
 
 
-def find_dataset_sources(data_dir: Path, train_name: str = "train", val_name: str = "validation") -> tuple[Path, Path | None, str]:
+def find_dataset_sources(data_dir: Path, train_name: str = "train", val_name: str = "validation") -> tuple[
+    Path, Path | None, str]:
     for base in (data_dir / "hf_dataset", data_dir):
         train_dir = base / train_name
         val_dir = base / val_name
@@ -509,7 +504,6 @@ def stop_resource_monitor(monitor: Any, console: Console) -> None:
             except Exception as exc:  # pragma: no cover - depends on Erbium monitor implementation
                 console.print(f"Warning: failed to stop resource monitor with {method_name}(): {exc}")
             return
-    console.print("Warning: ResourceMonitor has no stop/close/terminate/shutdown method; skipping explicit cleanup.")
 
 
 def get_image_paths(row: dict[str, Any]) -> list[str]:
@@ -629,7 +623,8 @@ class ImageSFTCollator:
             if hasattr(self.processor, "apply_chat_template"):
                 text = self.processor.apply_chat_template(messages, add_generation_prompt=False, tokenize=False).strip()
             else:
-                text = self.processor.tokenizer.apply_chat_template(messages, add_generation_prompt=False, tokenize=False).strip()
+                text = self.processor.tokenizer.apply_chat_template(messages, add_generation_prompt=False,
+                                                                    tokenize=False).strip()
             texts.append(text)
             batch_images.append(images)
 
@@ -646,7 +641,8 @@ class ImageSFTCollator:
             labels[labels == token_id] = -100
 
         if self.mask_prompt_tokens:
-            marker_lists = [tokenizer.encode(marker, add_special_tokens=False) for marker in ("<start_of_turn>model\n", "model\n")]
+            marker_lists = [tokenizer.encode(marker, add_special_tokens=False) for marker in
+                            ("<start_of_turn>model\n", "model\n")]
             for row_index in range(labels.shape[0]):
                 for marker_tokens in marker_lists:
                     found = find_subsequence(batch["input_ids"][row_index], marker_tokens)
