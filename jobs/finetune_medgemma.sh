@@ -42,6 +42,7 @@ echo "---"
 module load arrow
 module load opencv
 module load python/3.12
+module load cuda/13.0
 export VENV_PATH=/scratch/atatc/venv
 source "$VENV_PATH/bin/activate"
 
