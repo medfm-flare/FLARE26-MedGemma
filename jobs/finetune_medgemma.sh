@@ -51,10 +51,29 @@ export HF_DATASETS_CACHE="${HF_DATASETS_CACHE:-${SCRATCH_BASE}/hf_datasets}"
 export TMPDIR="${TMPDIR:-${SCRATCH_BASE}/tmp/${SLURM_JOB_ID:-manual}}"
 mkdir -p "$HF_HOME" "$HF_DATASETS_CACHE" "$TMPDIR"
 
+if [[ -z "${HF_TOKEN:-}" && -n "${HUGGING_FACE_HUB_TOKEN:-}" ]]; then
+  export HF_TOKEN="$HUGGING_FACE_HUB_TOKEN"
+fi
+if [[ -z "${HF_TOKEN:-}" ]]; then
+  for token_file in "${HF_TOKEN_FILE:-}" "$HOME/.cache/huggingface/token" "$HOME/.huggingface/token"; do
+    if [[ -n "$token_file" && -r "$token_file" ]]; then
+      export HF_TOKEN="$(< "$token_file")"
+      break
+    fi
+  done
+fi
+if [[ -z "${HF_TOKEN:-}" ]]; then
+  echo "Hugging Face authentication is required. Export HF_TOKEN or run 'huggingface-cli login' on the cluster." >&2
+  exit 1
+fi
+export HUGGING_FACE_HUB_TOKEN="${HUGGING_FACE_HUB_TOKEN:-$HF_TOKEN}"
+
 WANDB_FLAG=()
-if [[ "${USE_WANDB:-0}" == "1" || "${USE_WANDB:-false}" == "true" ]]; then
+if [[ "${USE_WANDB:-1}" == "1" || "${USE_WANDB:-true}" == "true" ]]; then
   export WANDB_DIR="${WANDB_DIR:-${OUTPUT_ROOT}/wandb}"
+  export WANDB_MODE="${WANDB_MODE:-online}"
   export WANDB_PROJECT="${WANDB_PROJECT:-medgemma15-flare-mllm-2d}"
+  unset WANDB_DISABLED
   mkdir -p "$WANDB_DIR"
   WANDB_FLAG=(--wandb)
 else
