@@ -117,7 +117,7 @@ pip install -e .
 
 #### Run Your Modified Codebase
 
-You can use [dra-config](https://github.com/ATATC/dra-config) skills to generate the job script or the following
+You can use [DRA-config](https://github.com/ATATC/dra-config) skills to generate the job script or the following
 template.
 
 ```shell
