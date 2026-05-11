@@ -13,7 +13,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="${PROJECT_ROOT:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
+PROJECT_ROOT="${PROJECT_ROOT:-/scratch/${USERNAME}/app/MedGemma-FLARE-2D}"
 USERNAME="${USERNAME:-atatc}"
 DATASET_NAME="${DATASET_NAME:-FLARE-MLLM-2D}"
 EXPERIMENT_NAME="${EXPERIMENT_NAME:-flare-medgemma}"
