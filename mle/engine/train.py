@@ -265,7 +265,7 @@ def train(
         console.print(f"Saved final adapter and processor to {final_dir}")
     finally:
         if monitor is not None:
-            monitor.stop()
+            stop_resource_monitor(monitor, console)
 
 
 def dependency_gaps() -> list[str]:
@@ -425,6 +425,21 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def arrow_safe_value(value: Any) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, str):
+        return value
+    if isinstance(value, (dict, list, tuple)):
+        return json.dumps(value, ensure_ascii=False)
+    return str(value)
+
+
+def arrow_safe_records(rows: Sequence[dict[str, Any]]) -> list[dict[str, str]]:
+    keys = sorted({key for row in rows for key in row})
+    return [{key: arrow_safe_value(row.get(key)) for key in keys} for row in rows]
+
+
 def find_dataset_sources(data_dir: Path, train_name: str = "train", val_name: str = "validation") -> tuple[Path, Path | None, str]:
     for base in (data_dir / "hf_dataset", data_dir):
         train_dir = base / train_name
@@ -444,13 +459,25 @@ def load_splits(data_dir: Path, max_train_samples: int | None, max_eval_samples:
         train_dataset = load_from_disk(str(train_src))
         eval_dataset = load_from_disk(str(val_src)) if val_src else None
     else:
-        train_dataset = Dataset.from_list(read_jsonl(train_src))
-        eval_dataset = Dataset.from_list(read_jsonl(val_src)) if val_src else None
+        train_dataset = Dataset.from_list(arrow_safe_records(read_jsonl(train_src)))
+        eval_dataset = Dataset.from_list(arrow_safe_records(read_jsonl(val_src))) if val_src else None
     if max_train_samples:
         train_dataset = train_dataset.select(range(min(max_train_samples, len(train_dataset))))
     if eval_dataset is not None and max_eval_samples:
         eval_dataset = eval_dataset.select(range(min(max_eval_samples, len(eval_dataset))))
     return train_dataset, eval_dataset
+
+
+def stop_resource_monitor(monitor: Any, console: Console) -> None:
+    for method_name in ("stop", "close", "terminate", "shutdown"):
+        method = getattr(monitor, method_name, None)
+        if callable(method):
+            try:
+                method()
+            except Exception as exc:  # pragma: no cover - depends on Erbium monitor implementation
+                console.print(f"Warning: failed to stop resource monitor with {method_name}(): {exc}")
+            return
+    console.print("Warning: ResourceMonitor has no stop/close/terminate/shutdown method; skipping explicit cleanup.")
 
 
 def get_image_paths(row: dict[str, Any]) -> list[str]:
