@@ -19,8 +19,8 @@ DATASET_NAME="${DATASET_NAME:-FLARE-MLLM-2D}"
 EXPERIMENT_NAME="${EXPERIMENT_NAME:-flare-medgemma}"
 
 # DATA_ROOT must contain ${DATASET_NAME} as a child directory.
-DATA_ROOT="${DATA_ROOT:-/scratch/${USERNAME}/datasets}"
-OUTPUT_ROOT="${OUTPUT_ROOT:-/scratch/${USERNAME}/medgemma-flare-2d-output}"
+DATA_ROOT="${DATA_ROOT:-/scratch/${USERNAME}/input}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-/scratch/${USERNAME}/output/medgemma-flare-2d-output}"
 SCRATCH_BASE="${SCRATCH_BASE:-/scratch/${USERNAME}/medgemma-flare-2d}"
 EVAL_OUTPUT_DIR="${EVAL_OUTPUT_DIR:-${OUTPUT_ROOT}/${EXPERIMENT_NAME}-eval}"
 PREDICTIONS="${PREDICTIONS:-${OUTPUT_ROOT}/${EXPERIMENT_NAME}-infer/${EVAL_SPLIT:-validation}_predictions.jsonl}"
