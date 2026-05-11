@@ -77,6 +77,7 @@ def evaluate(
     config: ExpConfig,
     tasks: Sequence[str],
     use_wandb: bool,
+    smoke_test: bool,
     *,
     console: Console = Console(),
     **kwargs,
@@ -91,6 +92,7 @@ def evaluate(
     :param config: experiment configuration
     :param tasks: the tasks to evaluate on
     :param use_wandb: whether to use wandb for logging
+    :param smoke_test: whether to run in smoke test mode
     :param console: the console for logging
     :param kwargs: custom arguments
     """

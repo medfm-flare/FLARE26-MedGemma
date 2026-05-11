@@ -86,6 +86,7 @@ def train(
     batch_size: int,
     learning_rate: float,
     use_wandb: bool,
+    smoke_test: bool,
     *,
     console: Console = Console(),
     **kwargs,
@@ -102,6 +103,7 @@ def train(
     :param batch_size: the batch size for training
     :param learning_rate: the learning rate for training
     :param use_wandb: whether to use wandb for logging
+    :param smoke_test: whether to run in smoke test mode
     :param console: the console for logging
     :param kwargs: custom arguments
     """

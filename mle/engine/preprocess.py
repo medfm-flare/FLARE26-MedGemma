@@ -66,7 +66,7 @@ HF_DATASET_COLUMNS = [
 ]
 
 
-def preprocess(config: ExpConfig, use_wandb: bool, *, console: Console = Console(), **kwargs) -> None:
+def preprocess(config: ExpConfig, use_wandb: bool, smoke_test: bool, *, console: Console = Console(), **kwargs) -> None:
     """
     This is a template entrypoint for preprocessing. You MUST NOT change its signature, but you may add functions and
     classes to this file.
@@ -76,6 +76,7 @@ def preprocess(config: ExpConfig, use_wandb: bool, *, console: Console = Console
 
     :param config: experiment configuration
     :param use_wandb: whether to use wandb for logging
+    :param smoke_test: whether to run in smoke test mode
     :param console: the console for logging
     :param kwargs: custom arguments
     """

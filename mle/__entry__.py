@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 from json import load
 
 from yaml import safe_load
+from erbium.api import ResourceMonitor
 
 from mle.engine import DEFAULT_NUM_EPOCHS, DEFAULT_BATCH_SIZE, DEFAULT_LEARNING_RATE
 from mle.interfaces import preprocess, train, infer, evaluate
@@ -16,6 +17,7 @@ def __entry__() -> None:
     parser.add_argument("-c", "--config", choices=("slurm", "erbium"), default="erbium", help="Configuration to use")
     parser.add_argument("--suser", help="SLURM username")
     parser.add_argument("--custom_args", default=None, help="Custom arguments to pass to the engine")
+    parser.add_argument("--smoke_test", action="store_true", help="Run smoke test")
     subparsers = parser.add_subparsers(dest="system", required=True)
     # preprocess
     subparsers.add_parser("preprocess", help="Preprocess the dataset")
@@ -60,6 +62,9 @@ def __entry__() -> None:
                 custom_args.update(safe_load(f))
             else:
                 raise ValueError(f"Unsupported custom arguments file type: {args.custom_args}, expected JSON or YAML")
+    if args.smoke_test:
+        monitor = ResourceMonitor(f"{config.output_dir}/{config.experiment_name}-resource_monitor")
+        monitor.start()
     match args.system:
         case "preprocess":
             preprocess(config, args.wandb, **custom_args)
