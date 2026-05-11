@@ -24,7 +24,7 @@ OUTPUT_ROOT="${OUTPUT_ROOT:-/scratch/${USERNAME}/output/medgemma-flare-2d-output
 SCRATCH_BASE="${SCRATCH_BASE:-/scratch/${USERNAME}/medgemma-flare-2d}"
 MODEL_OUTPUT_DIR="${MODEL_OUTPUT_DIR:-${OUTPUT_ROOT}/${EXPERIMENT_NAME}-medgemma15-lora}"
 INFER_OUTPUT_DIR="${INFER_OUTPUT_DIR:-${OUTPUT_ROOT}/${EXPERIMENT_NAME}-infer}"
-PREDICTIONS_OUT="${PREDICTIONS_OUT:-${INFER_OUTPUT_DIR}/${INFER_SPLIT:-validation}_predictions.jsonl}"
+PREDICTIONS_OUT="${PREDICTIONS_OUT:-${INFER_OUTPUT_DIR}/${INFER_SPLIT:-all}_predictions.jsonl}"
 
 cd "$PROJECT_ROOT"
 mkdir -p logs logs/configs "$OUTPUT_ROOT" "$SCRATCH_BASE" "$INFER_OUTPUT_DIR"
@@ -90,7 +90,7 @@ read -r -a TASK_LIST <<< "${TASKS:-classification cell_counting detection multi_
 # evaluation engine's generation path and writes predictions_out.
 CONFIG_PATH="logs/configs/infer_${SLURM_JOB_ID:-manual}.yaml"
 cat > "$CONFIG_PATH" <<YAML
-split: ${INFER_SPLIT:-validation}
+split: ${INFER_SPLIT:-all}
 model_name_or_path: google/medgemma-1.5-4b-it
 model_output_dir: ${MODEL_OUTPUT_DIR}
 eval_output_dir: ${INFER_OUTPUT_DIR}

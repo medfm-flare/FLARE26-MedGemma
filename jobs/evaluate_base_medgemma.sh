@@ -23,7 +23,7 @@ DATA_ROOT="${DATA_ROOT:-/scratch/${USERNAME}/input}"
 OUTPUT_ROOT="${OUTPUT_ROOT:-/scratch/${USERNAME}/output/medgemma-flare-2d-output}"
 SCRATCH_BASE="${SCRATCH_BASE:-/scratch/${USERNAME}/medgemma-flare-2d}"
 EVAL_OUTPUT_DIR="${EVAL_OUTPUT_DIR:-${OUTPUT_ROOT}/${EXPERIMENT_NAME}-eval}"
-PREDICTIONS="${PREDICTIONS:-${OUTPUT_ROOT}/${EXPERIMENT_NAME}-infer/${EVAL_SPLIT:-validation}_predictions.jsonl}"
+PREDICTIONS="${PREDICTIONS:-${OUTPUT_ROOT}/${EXPERIMENT_NAME}-infer/${EVAL_SPLIT:-all}_predictions.jsonl}"
 
 cd "$PROJECT_ROOT"
 mkdir -p logs logs/configs "$OUTPUT_ROOT" "$SCRATCH_BASE" "$EVAL_OUTPUT_DIR"
@@ -86,7 +86,7 @@ read -r -a TASK_LIST <<< "${TASKS:-classification cell_counting detection multi_
 
 CONFIG_PATH="logs/configs/evaluate_${SLURM_JOB_ID:-manual}.yaml"
 cat > "$CONFIG_PATH" <<YAML
-split: ${EVAL_SPLIT:-validation}
+split: ${EVAL_SPLIT:-all}
 predictions: ${PREDICTIONS}
 eval_output_dir: ${EVAL_OUTPUT_DIR}
 base_model: true
