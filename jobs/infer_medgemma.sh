@@ -118,7 +118,7 @@ python -m mle \
   --output_dir "$OUTPUT_ROOT" \
   --custom_args "$CONFIG_PATH" \
   "${WANDB_FLAG[@]}" \
-  evaluate \
+  infer \
   "${TASK_LIST[@]}"
 
 echo "---"
