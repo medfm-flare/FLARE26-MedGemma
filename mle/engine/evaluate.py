@@ -5,7 +5,7 @@ from rich.console import Console
 from mle.vars import ExpConfig
 
 
-def evaluate(config: ExpConfig, tasks: Sequence[str], use_wandb: bool, *,
+def evaluate(config: ExpConfig, tasks: Sequence[str], use_wandb: bool, smoke_test: bool, *,
           console: Console = Console(), **kwargs) -> None:
     """
     This is a template entrypoint for evaluation. You MUST NOT change its signature, but you may add functions and
@@ -17,6 +17,7 @@ def evaluate(config: ExpConfig, tasks: Sequence[str], use_wandb: bool, *,
     :param config: experiment configuration
     :param tasks: the tasks to evaluate on
     :param use_wandb: whether to use wandb for logging
+    :param smoke_test: whether to run in smoke test mode
     :param console: the console for logging
     :param kwargs: custom arguments
     """
