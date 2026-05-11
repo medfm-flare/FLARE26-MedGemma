@@ -4,7 +4,7 @@ from json import load
 from yaml import safe_load
 
 from mle.engine import DEFAULT_NUM_EPOCHS, DEFAULT_BATCH_SIZE, DEFAULT_LEARNING_RATE
-from mle.interfaces import preprocess, train, evaluate
+from mle.interfaces import preprocess, train, infer, evaluate
 from mle.vars import erbium_config, slurm_config
 
 
@@ -24,6 +24,9 @@ def __entry__() -> None:
     train_parser.add_argument("--num_epochs", type=int, default=DEFAULT_NUM_EPOCHS, help="Number of epochs to train")
     train_parser.add_argument("--batch_size", type=int, default=DEFAULT_BATCH_SIZE, help="Batch size")
     train_parser.add_argument("--learning_rate", type=float, default=DEFAULT_LEARNING_RATE, help="Learning rate")
+    # infer
+    infer_parser = subparsers.add_parser("infer", help="Infer the model")
+    infer_parser.add_argument("tasks", nargs="+", help="Tasks to evaluate, e.g. `classification`")
     # evaluate
     evaluate_parser = subparsers.add_parser("evaluate", help="Evaluate the model")
     evaluate_parser.add_argument("tasks", nargs="+", help="Tasks to evaluate, e.g. `classification`")
@@ -59,5 +62,7 @@ def __entry__() -> None:
             preprocess(config, args.wandb, **custom_args)
         case "train":
             train(config, args.num_epochs, args.batch_size, args.learning_rate, args.wandb, **custom_args)
+        case "infer":
+            infer(config, args.tasks, args.wandb, **custom_args)
         case "evaluate":
             evaluate(config, args.tasks, args.wandb, **custom_args)

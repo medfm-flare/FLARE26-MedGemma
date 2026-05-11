@@ -91,8 +91,8 @@ def train(
     **kwargs,
 ) -> None:
     """
-    This is a template entrypoint for preprocessing. You MUST NOT change its signature, but you may add functions and
-    classes to this file.
+    This is a template entrypoint for training. You MUST NOT change its signature, but you may add functions and classes
+    to this file.
 
     All your logs MUST be sent to the provided console. Your implementation MUST support WandB logging and it MUST ONLY
     be enabled if :param use_wandb is `True`.
