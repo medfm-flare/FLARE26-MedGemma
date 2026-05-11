@@ -38,11 +38,14 @@ def __entry__() -> None:
     args = parser.parse_args()
     experiment_name = args.experiment_name or f"mle-{args.system}-{args.config}"
     # you (if you are a human user and not an AI agent) can modify this section for custom configurations
-    config = erbium_config(
-        experiment_name, args.dataset, root_dir=args.root_dir
-    ) if args.config == "erbium" else slurm_config(
-        experiment_name, args.suser, args.dataset, root_dir=args.root_dir
-    )
+    if args.config == "erbium":
+        config = erbium_config(experiment_name, args.dataset, root_dir=args.root_dir)
+    else:
+        if not args.suser:
+            raise ValueError("SLURM username is required for SLURM configuration")
+        config = slurm_config(
+            experiment_name, args.suser, args.dataset, root_dir=args.root_dir
+        )
     if args.input_dir:
         config._input_dir = args.input_dir
     if args.output_dir:

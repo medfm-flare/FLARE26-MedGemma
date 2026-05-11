@@ -29,7 +29,7 @@ class ExpConfig(object):
     def output_dir(self) -> str:
         return self._output_dir or f"{self.root_dir}/output"
 
-    def initialize(self, *, console: Console = Console()) -> None:
+    def initialize(self) -> None:
         if not exists(self.root_dir):
             raise FileNotFoundError(f"Directory {self.root_dir} does not exist")
         if not exists(self.input_dir):
