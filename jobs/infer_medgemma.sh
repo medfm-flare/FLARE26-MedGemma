@@ -1,11 +1,11 @@
 #!/bin/bash
 #SBATCH --job-name=medgemma-infer
-#SBATCH --account=rrg-jma
+#SBATCH --account=def-jma-ab
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --gpus-per-node=nvidia_h100_80gb_hbm3_3g.40gb:1
+#SBATCH --gpus-per-node=h100:1
 #SBATCH --cpus-per-task=2
-#SBATCH --mem=8G
+#SBATCH --mem=32G
 #SBATCH --time=06:00:00
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
@@ -109,7 +109,7 @@ predictions_out: ${PREDICTIONS_OUT}
 image_size: ${IMAGE_SIZE:-896}
 resize_mode: square
 max_images_per_sample: 1
-batch_size: ${INFER_BATCH_SIZE:-1}
+batch_size: ${INFER_BATCH_SIZE:-24}
 max_new_tokens: ${MAX_NEW_TOKENS:-256}
 temperature: ${TEMPERATURE:-0.0}
 load_in_4bit: true
