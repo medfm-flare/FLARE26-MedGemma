@@ -39,12 +39,13 @@ echo "Model:  google/medgemma-4b-it (base)"
 echo "Preds:  $PREDICTIONS_OUT"
 echo "---"
 
-# Optional environment activation. Set one of these before sbatch if needed:
-#   export CONDA_ENV=medgemma
 export VENV_PATH=/scratch/atatc/venv
-module load arrow
-module load opencv
 module load python/3.12
+module load StdEnv/2023
+module load gcc/12.3
+module load cuda/13.2
+module load arrow
+module load opencv/4.13.0
 module load cuda
 export VENV_PATH=/scratch/atatc/venv
 source "$VENV_PATH/bin/activate"
