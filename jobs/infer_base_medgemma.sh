@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=medgemma-base-infer
-#SBATCH --account=rrg-jma
+#SBATCH --account=def-jma-ab
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --gpus-per-node=h100:1
