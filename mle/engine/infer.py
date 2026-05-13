@@ -200,6 +200,7 @@ def start_wandb_run(config: ExpConfig, output_dir: Path, selected_tasks: Sequenc
             "batch_size": int(kwargs.get("batch_size", 1)),
             "max_new_tokens": int(kwargs.get("max_new_tokens", 256)),
         },
+        settings=wandb.Settings(init_timeout=int(os.environ.get("WANDB_INIT_TIMEOUT", "300"))),
     )
 
 

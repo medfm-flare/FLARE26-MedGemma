@@ -301,6 +301,7 @@ def configure_wandb(config: ExpConfig, output_dir: Path, use_wandb: bool, kwargs
         os.environ.setdefault("WANDB_DIR", str(output_dir / "wandb"))
         os.environ.setdefault("WANDB_PROJECT", str(kwargs.get("wandb_project", "medgemma15-flare-mllm-2d")))
         os.environ.setdefault("WANDB_RUN_NAME", str(kwargs.get("wandb_run_name", config.experiment_name)))
+        os.environ.setdefault("WANDB_INIT_TIMEOUT", str(kwargs.get("wandb_init_timeout", 300)))
         for env_name, key in (("WANDB_ENTITY", "wandb_entity"), ("WANDB_MODE", "wandb_mode"),
                               ("WANDB_TAGS", "wandb_tags")):
             if kwargs.get(key):

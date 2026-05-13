@@ -22,6 +22,9 @@ EXPERIMENT_NAME="${EXPERIMENT_NAME:-flare-medgemma1-base}"
 DATA_ROOT="${DATA_ROOT:-/scratch/${USERNAME}/input}"
 OUTPUT_ROOT="${OUTPUT_ROOT:-/scratch/${USERNAME}/output/medgemma-flare-2d-output}"
 SCRATCH_BASE="${SCRATCH_BASE:-/scratch/${USERNAME}/medgemma-flare-2d}"
+SLURM_HOME="${SLURM_HOME:-/scratch/${USERNAME}}"
+export HOME="$SLURM_HOME"
+export NETRC="${NETRC:-${SLURM_HOME}/.netrc}"
 EVAL_OUTPUT_DIR="${EVAL_OUTPUT_DIR:-${OUTPUT_ROOT}/${EXPERIMENT_NAME}-eval}"
 PREDICTIONS="${PREDICTIONS:-${OUTPUT_ROOT}/${EXPERIMENT_NAME}-infer/{split}_predictions.jsonl}"
 
@@ -51,13 +54,20 @@ source "$VENV_PATH/bin/activate"
 export HF_HOME="${HF_HOME:-${SCRATCH_BASE}/hf_cache}"
 export HF_DATASETS_CACHE="${HF_DATASETS_CACHE:-${SCRATCH_BASE}/hf_datasets}"
 export TMPDIR="${TMPDIR:-${SCRATCH_BASE}/tmp/${SLURM_JOB_ID:-manual}}"
-mkdir -p "$HF_HOME" "$HF_DATASETS_CACHE" "$TMPDIR"
+export XDG_CACHE_HOME="${XDG_CACHE_HOME:-${SCRATCH_BASE}/xdg_cache}"
+export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-${SCRATCH_BASE}/xdg_config}"
+export MPLCONFIGDIR="${MPLCONFIGDIR:-${XDG_CONFIG_HOME}/matplotlib}"
+export WANDB_CACHE_DIR="${WANDB_CACHE_DIR:-${SCRATCH_BASE}/wandb_cache}"
+export WANDB_CONFIG_DIR="${WANDB_CONFIG_DIR:-${SCRATCH_BASE}/wandb_config}"
+export WANDB_DATA_DIR="${WANDB_DATA_DIR:-${SCRATCH_BASE}/wandb_data}"
+export WANDB_INIT_TIMEOUT="${WANDB_INIT_TIMEOUT:-300}"
+mkdir -p "$HF_HOME" "$HF_DATASETS_CACHE" "$TMPDIR" "$XDG_CACHE_HOME" "$XDG_CONFIG_HOME" "$MPLCONFIGDIR" "$XDG_CACHE_HOME/fontconfig" "$WANDB_CACHE_DIR" "$WANDB_CONFIG_DIR" "$WANDB_DATA_DIR"
 
 if [[ -z "${HF_TOKEN:-}" && -n "${HUGGING_FACE_HUB_TOKEN:-}" ]]; then
   export HF_TOKEN="$HUGGING_FACE_HUB_TOKEN"
 fi
 if [[ -z "${HF_TOKEN:-}" ]]; then
-  for token_file in "${HF_TOKEN_FILE:-}" "$HOME/.cache/huggingface/token" "$HOME/.huggingface/token"; do
+  for token_file in "${HF_TOKEN_FILE:-}" "${SLURM_HOME}/.cache/huggingface/token" "${SLURM_HOME}/.huggingface/token"; do
     if [[ -n "$token_file" && -r "$token_file" ]]; then
       export HF_TOKEN="$(< "$token_file")"
       break
@@ -76,7 +86,7 @@ if [[ "${USE_WANDB:-1}" == "1" || "${USE_WANDB:-true}" == "true" ]]; then
   export WANDB_MODE="${WANDB_MODE:-online}"
   export WANDB_PROJECT="${WANDB_PROJECT:-medgemma1-flare-mllm-2d}"
   unset WANDB_DISABLED
-  mkdir -p "$WANDB_DIR"
+  mkdir -p "$WANDB_DIR" "$WANDB_CACHE_DIR" "$WANDB_CONFIG_DIR" "$WANDB_DATA_DIR"
   WANDB_FLAG=(--wandb)
 else
   export WANDB_DISABLED=true

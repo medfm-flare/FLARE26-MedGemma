@@ -21,7 +21,7 @@ The dataset directory must be available at:
 For the local dataset path in the prompt, use:
 
 ```text
-INPUT_DIR=$HOME/Downloads
+INPUT_DIR=/scratch/atatc/input
 DATASET_NAME=FLARE-MLLM-2D
 ```
 
@@ -52,7 +52,7 @@ an Arrow dataset under `{OUTPUT_DIR}/Preprocessed-FLARE-MLLM-2D/hf_dataset`.
 python -m mle \
   -d FLARE-MLLM-2D \
   --root_dir "$PWD" \
-  --input_dir "$HOME/Downloads" \
+  --input_dir "/scratch/atatc/input" \
   --output_dir "$PWD/output" \
   preprocess
 ```
@@ -77,7 +77,7 @@ no_hf_dataset: false
 python -m mle \
   -d FLARE-MLLM-2D \
   --root_dir "$PWD" \
-  --input_dir "$HOME/Downloads" \
+  --input_dir "/scratch/atatc/input" \
   --output_dir "$PWD/output" \
   --custom_args preprocess.yaml \
   preprocess
@@ -93,7 +93,7 @@ Example:
 python -m mle \
   -d FLARE-MLLM-2D \
   --root_dir "$PWD" \
-  --input_dir "$HOME/Downloads" \
+  --input_dir "/scratch/atatc/input" \
   --output_dir "$PWD/output" \
   --custom_args train-medgemma.yaml \
   train \
@@ -145,7 +145,7 @@ Example:
 python -m mle \
   -d FLARE-MLLM-2D \
   --root_dir "$PWD" \
-  --input_dir "$HOME/Downloads" \
+  --input_dir "/scratch/atatc/input" \
   --output_dir "$PWD/output-smoke" \
   --custom_args train-medgemma.yaml \
   --smoke_test \
@@ -166,7 +166,7 @@ Inference generates predictions with the fine-tuned adapter when available, then
 python -m mle \
   -d FLARE-MLLM-2D \
   --root_dir "$PWD" \
-  --input_dir "$HOME/Downloads" \
+  --input_dir "/scratch/atatc/input" \
   --output_dir "$PWD/output" \
   --custom_args infer-medgemma.yaml \
   infer \
@@ -214,7 +214,7 @@ temperature: 0.0
 python -m mle \
   -d FLARE-MLLM-2D \
   --root_dir "$PWD" \
-  --input_dir "$HOME/Downloads" \
+  --input_dir "/scratch/atatc/input" \
   --output_dir "$PWD/output" \
   --custom_args infer-base.yaml \
   infer \
@@ -246,7 +246,7 @@ green_max_length: 2048
 python -m mle \
   -d FLARE-MLLM-2D \
   --root_dir "$PWD" \
-  --input_dir "$HOME/Downloads" \
+  --input_dir "/scratch/atatc/input" \
   --output_dir "$PWD/output" \
   --custom_args eval-medgemma.yaml \
   evaluate \

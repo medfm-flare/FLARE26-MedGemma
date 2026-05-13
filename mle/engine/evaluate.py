@@ -1,5 +1,6 @@
 import json
 import math
+import os
 import re
 from dataclasses import dataclass
 from pathlib import Path
@@ -141,6 +142,7 @@ def evaluate(
             name=kwargs.get("wandb_run_name", f"{config.experiment_name}-evaluate"),
             dir=str(output_dir / "wandb"),
             config={"splits": splits, "tasks": selected_tasks},
+            settings=wandb.Settings(init_timeout=int(os.environ.get("WANDB_INIT_TIMEOUT", "300"))),
         )
         if len(splits) == 1:
             wandb.log({f"eval/{key}": value for key, value in results["metrics"].items() if isinstance(value, (int, float))})

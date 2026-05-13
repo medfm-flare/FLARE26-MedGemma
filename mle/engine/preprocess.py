@@ -1,4 +1,5 @@
 import json
+import os
 import re
 import zipfile
 from collections import Counter
@@ -168,6 +169,7 @@ def preprocess(config: ExpConfig, use_wandb: bool, smoke_test: bool, *, console:
             name=kwargs.get("wandb_run_name", f"{config.experiment_name}-preprocess"),
             dir=str(output_dir / "wandb"),
             config=stats,
+            settings=wandb.Settings(init_timeout=int(os.environ.get("WANDB_INIT_TIMEOUT", "300"))),
         )
         wandb.log({
             "preprocess/train_rows": len(train_rows),
