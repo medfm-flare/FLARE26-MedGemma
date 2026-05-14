@@ -350,20 +350,32 @@ def write_json(path: Path, payload: Mapping[str, Any]) -> None:
 
 
 def load_records(path: Path) -> list[Any]:
-    if path.suffix == ".jsonl":
-        records = []
-        with open(path, "r", encoding="utf-8") as handle:
-            for line in handle:
-                if line.strip():
-                    records.append(json.loads(line))
-        return records
+    if path.suffix == ".jsonl" or ".jsonl" in path.name:
+        return read_jsonl_records(path)
     with open(path, "r", encoding="utf-8") as handle:
-        data = json.load(handle)
+        try:
+            data = json.load(handle)
+        except json.JSONDecodeError as exc:
+            if "Extra data" not in str(exc):
+                raise
+            return read_jsonl_records(path)
     if isinstance(data, list):
         return data
     if isinstance(data, dict):
         return [data]
     raise ValueError(f"Unsupported prediction file top-level type: {type(data).__name__}")
+
+
+def read_jsonl_records(path: Path) -> list[Any]:
+    records = []
+    with open(path, "r", encoding="utf-8") as handle:
+        for line_number, line in enumerate(handle, start=1):
+            if line.strip():
+                try:
+                    records.append(json.loads(line))
+                except json.JSONDecodeError as exc:
+                    raise json.JSONDecodeError(f"{exc.msg} at {path}:{line_number}", exc.doc, exc.pos) from exc
+    return records
 
 
 def normalize_prediction_records(records: list[Any]) -> list[dict[str, Any]]:
