@@ -83,17 +83,7 @@ export HUGGING_FACE_HUB_TOKEN="${HUGGING_FACE_HUB_TOKEN:-$HF_TOKEN}"
 WANDB_FLAG=()
 if [[ "${USE_WANDB:-1}" == "1" || "${USE_WANDB:-true}" == "true" ]]; then
   export WANDB_DIR="${WANDB_DIR:-${OUTPUT_ROOT}/wandb}"
-  if [[ -z "${WANDB_MODE:-}" ]]; then
-    WANDB_CLUSTER_NAME="${CC_CLUSTER:-${SLURM_CLUSTER_NAME:-$(hostname -f 2>/dev/null || hostname)}}"
-    if [[ "${WANDB_CLUSTER_NAME,,}" == *trillium* ]]; then
-      export WANDB_MODE=offline
-      echo "Detected Trillium ($WANDB_CLUSTER_NAME); using WANDB_MODE=offline. Sync later with: wandb sync $WANDB_DIR"
-    else
-      export WANDB_MODE=online
-    fi
-  else
-    export WANDB_MODE
-  fi
+  export WANDB_MODE="${WANDB_MODE:-online}"
   export WANDB_PROJECT="${WANDB_PROJECT:-medgemma15-flare-mllm-2d}"
   unset WANDB_DISABLED
   mkdir -p "$WANDB_DIR" "$WANDB_CACHE_DIR" "$WANDB_CONFIG_DIR" "$WANDB_DATA_DIR"
