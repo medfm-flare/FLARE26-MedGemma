@@ -3,7 +3,7 @@
 #SBATCH --account=rrg-jma
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --gpus-per-node=h100:1
+#SBATCH --gpus-per-node=nvidia_h100_80gb_hbm3_3g.40gb:1
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=32G
 #SBATCH --time=8:00:00
@@ -84,7 +84,17 @@ export HUGGING_FACE_HUB_TOKEN="${HUGGING_FACE_HUB_TOKEN:-$HF_TOKEN}"
 WANDB_FLAG=()
 if [[ "${USE_WANDB:-1}" == "1" || "${USE_WANDB:-true}" == "true" ]]; then
   export WANDB_DIR="${WANDB_DIR:-${OUTPUT_ROOT}/wandb}"
-  export WANDB_MODE="${WANDB_MODE:-online}"
+  if [[ -z "${WANDB_MODE:-}" ]]; then
+    WANDB_CLUSTER_NAME="${CC_CLUSTER:-${SLURM_CLUSTER_NAME:-$(hostname -f 2>/dev/null || hostname)}}"
+    if [[ "${WANDB_CLUSTER_NAME,,}" == *trillium* ]]; then
+      export WANDB_MODE=offline
+      echo "Detected Trillium ($WANDB_CLUSTER_NAME); using WANDB_MODE=offline. Sync later with: wandb sync $WANDB_DIR"
+    else
+      export WANDB_MODE=online
+    fi
+  else
+    export WANDB_MODE
+  fi
   export WANDB_PROJECT="${WANDB_PROJECT:-medgemma15-flare-mllm-2d}"
   unset WANDB_DISABLED
   mkdir -p "$WANDB_DIR" "$WANDB_CACHE_DIR" "$WANDB_CONFIG_DIR" "$WANDB_DATA_DIR"
@@ -107,7 +117,7 @@ predictions_out: ${PREDICTIONS_OUT}
 image_size: ${IMAGE_SIZE:-896}
 resize_mode: square
 max_images_per_sample: 1
-batch_size: ${INFER_BATCH_SIZE:-24}
+batch_size: ${INFER_BATCH_SIZE:-32}
 max_new_tokens: ${MAX_NEW_TOKENS:-256}
 temperature: ${TEMPERATURE:-0.0}
 load_in_4bit: true
