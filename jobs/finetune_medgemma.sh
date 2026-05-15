@@ -133,7 +133,7 @@ python -m mle \
   --custom_args "$CONFIG_PATH" \
   "${WANDB_FLAG[@]}" \
   train \
-  --num_epochs "${NUM_EPOCHS:-1}" \
+  --num_epochs "${NUM_EPOCHS:-3}" \
   --batch_size "${BATCH_SIZE:-8}" \
   --learning_rate "${LEARNING_RATE:-2e-4}"
 
