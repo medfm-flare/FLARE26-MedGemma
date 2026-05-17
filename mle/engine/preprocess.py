@@ -31,6 +31,8 @@ TASK_ALIASES = {
     "multi label classification": "multi_label_classification",
     "multi_label_classification": "multi_label_classification",
     "multilabel": "multi_label_classification",
+    "instance detection": "detection",
+    "instance_detection": "detection",
     "detection": "detection",
     "cell counting": "cell_counting",
     "counting": "cell_counting",
@@ -246,7 +248,8 @@ def looks_like_detection(record: dict[str, Any]) -> bool:
         return True
     if isinstance(answer, list) and answer and all(isinstance(item, (dict, list)) for item in answer):
         return True
-    return "detection" in as_text(first_present(record, ["TaskType", "task_type", "task"])).lower()
+    task_text = as_text(first_present(record, ["TaskType", "task_type", "task"])).lower()
+    return "detection" in task_text
 
 
 def infer_task_type(raw_task: Any, answer: Any, question: Any, record: dict[str, Any]) -> str:

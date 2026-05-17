@@ -125,6 +125,10 @@ iou_threshold: ${IOU_THRESHOLD:-0.5}
 green_model_name: StanfordAIMI/GREEN-radllama2-7b
 green_batch_size: ${GREEN_BATCH_SIZE:-8}
 green_max_length: ${GREEN_MAX_LENGTH:-2048}
+crimson_api: ${CRIMSON_API:-hf}
+crimson_model_name: ${CRIMSON_MODEL_NAME:-}
+crimson_batch_size: ${CRIMSON_BATCH_SIZE:-1}
+skip_crimson_score: ${SKIP_CRIMSON_SCORE:-false}
 YAML
 
 python -m mle \

@@ -2,15 +2,15 @@
 
 ## Usage
 
-This implementation fine-tunes `google/medgemma-1.5-4b-it` on FLARE-MLLM-2D and evaluates the six requested FLARE
+This implementation fine-tunes `google/medgemma-1.5-4b-it` on FLARE-MLLM-2D and evaluates the requested FLARE
 tasks:
 
-- disease diagnostic classification: balanced accuracy
-- cell counting: mean absolute error
-- detection: F1 with IoU > 0.5 matching
-- multi-label classification: example-level F1
-- regression: mean absolute error
-- report generation: GREEN score using `ATATC/GREEN`
+- disease diagnostic classification: balanced accuracy, accuracy, weighted F1
+- cell counting: mean absolute error and RMSE
+- detection: F1, precision, and recall at IoU 0.3-0.7, plus COCO-style averages and per-label/chromosome breakdowns when labels are present
+- multi-label classification: example-level F1, precision, and recall
+- regression: mean absolute error and RMSE
+- report generation: GREEN score using `ATATC/GREEN` and CRIMSON using `crimson-score`
 
 The dataset directory must be available at:
 
@@ -137,7 +137,8 @@ same preprocessing, training, inference, and evaluation code paths but applies s
 - preprocessing limits rows per source JSON to 32 unless `max_rows_per_json` is set
 - training limits to 8 train rows, 4 validation rows, 2 optimizer steps, smaller LoRA rank, and infrequent checkpointing
 - inference limits to 4 rows, batch size 1, 512px images, and 32 generated tokens
-- evaluation limits to 4 rows and skips the heavy GREEN scorer by default; set `skip_green_score: false` to force it
+- evaluation limits to 4 rows and skips the heavy GREEN and CRIMSON scorers by default; set `skip_green_score: false`
+  or `skip_crimson_score: false` to force them
 
 Example:
 
@@ -240,6 +241,10 @@ iou_threshold: 0.5
 green_model_name: StanfordAIMI/GREEN-radllama2-7b
 green_batch_size: 8
 green_max_length: 2048
+crimson_api: hf
+crimson_model_name: null  # default CRIMSON MedGemma model
+crimson_batch_size: 1
+skip_crimson_score: false
 ```
 
 ```shell

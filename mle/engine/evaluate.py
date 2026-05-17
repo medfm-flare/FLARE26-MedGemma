@@ -40,6 +40,8 @@ TASK_ALIASES = {
     "multi label classification": "multi_label_classification",
     "multi_label": "multi_label_classification",
     "multilabel": "multi_label_classification",
+    "instance detection": "detection",
+    "instance_detection": "detection",
     "count": "cell_counting",
     "counting": "cell_counting",
     "cell counting": "cell_counting",
@@ -99,11 +101,12 @@ def evaluate(
     """
     kwargs = dict(kwargs)
     if smoke_test:
-        console.print("Smoke test mode: limiting evaluation rows and skipping heavy GREEN scoring by default.")
+        console.print("Smoke test mode: limiting evaluation rows and skipping heavy report scorers by default.")
         kwargs.setdefault("max_samples", 4)
         kwargs.setdefault("green_batch_size", 1)
         kwargs.setdefault("green_max_length", 1024)
         kwargs.setdefault("skip_green_score", True)
+        kwargs.setdefault("skip_crimson_score", True)
 
     selected_tasks = normalize_task_list(tasks or kwargs.get("tasks") or TASK_METRIC)
     splits = resolve_eval_splits(kwargs)
@@ -222,6 +225,11 @@ def evaluate_one_split(
         green_batch_size=int(kwargs.get("green_batch_size", 8)),
         green_max_length=int(kwargs.get("green_max_length", 2048)),
         skip_green_score=parse_bool(kwargs.get("skip_green_score", False)),
+        crimson_api=str(kwargs.get("crimson_api", "hf")),
+        crimson_model_name=optional_str(kwargs.get("crimson_model_name")),
+        crimson_batch_size=int(kwargs.get("crimson_batch_size", 1)),
+        crimson_include_guidelines=not parse_bool(kwargs.get("crimson_no_guidelines", False)),
+        skip_crimson_score=parse_bool(kwargs.get("skip_crimson_score", False)),
     )
     results["predictions"] = str(predictions_out)
     results["split"] = split
@@ -349,6 +357,13 @@ def optional_int(value: Any) -> int | None:
         return None
     out = int(value)
     return out if out > 0 else None
+
+
+def optional_str(value: Any) -> str | None:
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
 
 
 def parse_bool(value: Any) -> bool:
@@ -679,20 +694,59 @@ def balanced_accuracy_score(y_true: Sequence[str], y_pred: Sequence[str]) -> flo
     return sum(hits[label] / totals[label] for label in sorted(totals)) / len(totals)
 
 
-def example_f1_score(y_true: Sequence[set[str]], y_pred: Sequence[set[str]]) -> float:
+def accuracy_score(y_true: Sequence[str], y_pred: Sequence[str]) -> float:
     if not y_true:
         return float("nan")
-    scores = []
+    return sum(int(gold == pred) for gold, pred in zip(y_true, y_pred)) / len(y_true)
+
+
+def weighted_f1_score(y_true: Sequence[str], y_pred: Sequence[str]) -> float:
+    if not y_true:
+        return float("nan")
+    labels = sorted(set(y_true) | set(y_pred))
+    total_support = len(y_true)
+    weighted_sum = 0.0
+    for label in labels:
+        tp = sum(1 for gold, pred in zip(y_true, y_pred) if gold == label and pred == label)
+        fp = sum(1 for gold, pred in zip(y_true, y_pred) if gold != label and pred == label)
+        fn = sum(1 for gold, pred in zip(y_true, y_pred) if gold == label and pred != label)
+        support = sum(1 for gold in y_true if gold == label)
+        denom = 2 * tp + fp + fn
+        f1 = 0.0 if denom == 0 else (2 * tp) / denom
+        weighted_sum += support * f1
+    return weighted_sum / total_support
+
+
+def example_f1_score(y_true: Sequence[set[str]], y_pred: Sequence[set[str]]) -> float:
+    return multilabel_metrics(y_true, y_pred)["f1_score"]
+
+
+def multilabel_metrics(y_true: Sequence[set[str]], y_pred: Sequence[set[str]]) -> dict[str, float]:
+    if not y_true:
+        return {"f1_score": float("nan"), "precision": float("nan"), "recall": float("nan")}
+    f1_scores = []
+    precisions = []
+    recalls = []
     for gold, pred in zip(y_true, y_pred):
         if not gold and not pred:
-            scores.append(1.0)
+            f1_scores.append(1.0)
+            precisions.append(1.0)
+            recalls.append(1.0)
             continue
         tp = len(gold & pred)
         fp = len(pred - gold)
         fn = len(gold - pred)
-        denom = 2 * tp + fp + fn
-        scores.append(0.0 if denom == 0 else (2 * tp) / denom)
-    return sum(scores) / len(scores)
+        precision = 0.0 if tp + fp == 0 else tp / (tp + fp)
+        recall = 0.0 if tp + fn == 0 else tp / (tp + fn)
+        f1 = 0.0 if precision + recall == 0 else 2 * precision * recall / (precision + recall)
+        precisions.append(precision)
+        recalls.append(recall)
+        f1_scores.append(f1)
+    return {
+        "f1_score": sum(f1_scores) / len(f1_scores),
+        "precision": sum(precisions) / len(precisions),
+        "recall": sum(recalls) / len(recalls),
+    }
 
 
 def mean_absolute_error(y_true: Sequence[float], y_pred: Sequence[float]) -> float:
@@ -701,7 +755,20 @@ def mean_absolute_error(y_true: Sequence[float], y_pred: Sequence[float]) -> flo
     return sum(abs(gold - pred) for gold, pred in zip(y_true, y_pred)) / len(y_true)
 
 
-def detection_f1_score(gold_values: Sequence[Any], pred_values: Sequence[Any], threshold: float) -> tuple[float, dict[str, int]]:
+def root_mean_squared_error(y_true: Sequence[float], y_pred: Sequence[float]) -> float:
+    if not y_true:
+        return float("nan")
+    return math.sqrt(sum((gold - pred) ** 2 for gold, pred in zip(y_true, y_pred)) / len(y_true))
+
+
+def prf_from_counts(total_tp: int, total_fp: int, total_fn: int) -> dict[str, float]:
+    precision = 0.0 if total_tp + total_fp == 0 else total_tp / (total_tp + total_fp)
+    recall = 0.0 if total_tp + total_fn == 0 else total_tp / (total_tp + total_fn)
+    f1 = 0.0 if precision + recall == 0 else 2 * precision * recall / (precision + recall)
+    return {"f1_score": f1, "precision": precision, "recall": recall}
+
+
+def detection_counts(gold_values: Sequence[Any], pred_values: Sequence[Any], threshold: float) -> dict[str, int]:
     total_tp = total_fp = total_fn = 0
     for gold_raw, pred_raw in zip(gold_values, pred_values):
         gold_boxes = parse_boxes(gold_raw)
@@ -713,8 +780,77 @@ def detection_f1_score(gold_values: Sequence[Any], pred_values: Sequence[Any], t
         total_tp += tp
         total_fp += fp
         total_fn += fn
-    denom = 2 * total_tp + total_fp + total_fn
-    return (1.0 if denom == 0 else (2 * total_tp) / denom), {"tp": total_tp, "fp": total_fp, "fn": total_fn}
+    return {"tp": total_tp, "fp": total_fp, "fn": total_fn}
+
+
+def detection_metrics(gold_values: Sequence[Any], pred_values: Sequence[Any], threshold: float) -> dict[str, Any]:
+    counts = detection_counts(gold_values, pred_values, threshold)
+    return {**prf_from_counts(counts["tp"], counts["fp"], counts["fn"]), **counts}
+
+
+def per_label_detection_metrics(gold_values: Sequence[Any], pred_values: Sequence[Any], threshold: float) -> dict[str, Any]:
+    label_counts: dict[str, dict[str, int]] = {}
+    for gold_raw, pred_raw in zip(gold_values, pred_values):
+        gold_boxes = parse_boxes(gold_raw)
+        try:
+            pred_boxes = parse_boxes(pred_raw)
+        except ValueError:
+            pred_boxes = []
+        labels = sorted({box.label or "__unlabeled__" for box in gold_boxes} | {box.label or "__unlabeled__" for box in pred_boxes})
+        for label in labels:
+            label_gold = [box for box in gold_boxes if (box.label or "__unlabeled__") == label]
+            label_pred = [box for box in pred_boxes if (box.label or "__unlabeled__") == label]
+            tp, fp, fn = greedy_match_counts(label_gold, label_pred, threshold)
+            counts = label_counts.setdefault(label, {"tp": 0, "fp": 0, "fn": 0})
+            counts["tp"] += tp
+            counts["fp"] += fp
+            counts["fn"] += fn
+    return {
+        label: {**prf_from_counts(counts["tp"], counts["fp"], counts["fn"]), **counts}
+        for label, counts in sorted(label_counts.items())
+    }
+
+
+def detection_f1_score(gold_values: Sequence[Any], pred_values: Sequence[Any], threshold: float) -> tuple[float, dict[str, int]]:
+    metrics = detection_metrics(gold_values, pred_values, threshold)
+    return metrics["f1_score"], {"tp": metrics["tp"], "fp": metrics["fp"], "fn": metrics["fn"]}
+
+
+def detection_threshold_metrics(
+    gold_values: Sequence[Any],
+    pred_values: Sequence[Any],
+    thresholds: Sequence[float] = (0.3, 0.4, 0.5, 0.6, 0.7),
+) -> dict[str, Any]:
+    detailed_metrics = {}
+    f1_values = []
+    precision_values = []
+    recall_values = []
+    for threshold in thresholds:
+        metrics = detection_metrics(gold_values, pred_values, threshold)
+        detailed_metrics[f"IoU_{threshold:.1f}"] = metrics
+        f1_values.append(metrics["f1_score"])
+        precision_values.append(metrics["precision"])
+        recall_values.append(metrics["recall"])
+
+    metrics_at_03 = detailed_metrics["IoU_0.3"]
+    metrics_at_05 = detailed_metrics["IoU_0.5"]
+    return {
+        "f1_score": metrics_at_05["f1_score"],
+        "precision": metrics_at_05["precision"],
+        "recall": metrics_at_05["recall"],
+        "f1_score_at_03": metrics_at_03["f1_score"],
+        "f1_score_at_05": metrics_at_05["f1_score"],
+        "average_f1": sum(f1_values) / len(f1_values),
+        "precision_at_03": metrics_at_03["precision"],
+        "recall_at_03": metrics_at_03["recall"],
+        "detailed_metrics": detailed_metrics,
+        "coco_style_metrics": {
+            "average_f1": sum(f1_values) / len(f1_values),
+            "average_precision": sum(precision_values) / len(precision_values),
+            "average_recall": sum(recall_values) / len(recall_values),
+        },
+        "per_chromosome_metrics": per_label_detection_metrics(gold_values, pred_values, 0.3),
+    }
 
 
 def green_score(refs: Sequence[str], hyps: Sequence[str], model_name: str, output_dir: Path, batch_size: int, max_length: int) -> float:
@@ -732,6 +868,95 @@ def green_score(refs: Sequence[str], hyps: Sequence[str], model_name: str, outpu
         setattr(tokenizer, "batch_encode_plus", lambda texts, *args, **kw: tokenizer(texts, *args, **kw))
     mean, _std, _per_case, _summary, _result_df = scorer(list(refs), list(hyps))
     return float(mean)
+
+
+def crimson_patient_context(row: Mapping[str, Any]) -> dict[str, str] | None:
+    context_keys = {
+        "Age": ("Age", "age", "patient_age"),
+        "Indication": ("Indication", "indication", "clinical_indication", "reason_for_exam"),
+    }
+    context = {}
+    for output_key, source_keys in context_keys.items():
+        value = first_present(row, source_keys)
+        if value is not None and as_text(value).strip():
+            context[output_key] = as_text(value).strip()
+    return context or None
+
+
+def crimson_score(
+    refs: Sequence[str],
+    hyps: Sequence[str],
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    api: str,
+    model_name: str | None,
+    batch_size: int,
+    include_guidelines: bool,
+) -> dict[str, Any]:
+    try:
+        from CRIMSON import CRIMSONScore
+    except ImportError as exc:
+        raise ImportError("CRIMSON scoring requires the `crimson-score` package, imported as `CRIMSON`.") from exc
+
+    scorer_kwargs = {"api": api}
+    if model_name:
+        scorer_kwargs["model_name"] = model_name
+    scorer = CRIMSONScore(**scorer_kwargs)
+    contexts = [crimson_patient_context(row) for row in rows]
+    results = []
+
+    if api in {"hf", "huggingface", "vllm"} and hasattr(scorer, "evaluate_batch"):
+        results = scorer.evaluate_batch(
+            list(refs),
+            list(hyps),
+            patient_contexts=contexts,
+            include_guidelines=include_guidelines,
+            batch_size=max(1, batch_size),
+        )
+    else:
+        for ref, hyp, context in zip(refs, hyps, contexts):
+            results.append(
+                scorer.evaluate(
+                    reference_findings=ref,
+                    predicted_findings=hyp,
+                    patient_context=context,
+                    include_guidelines=include_guidelines,
+                )
+            )
+
+    valid_results = [result for result in results if isinstance(result, Mapping) and result.get("crimson_score") is not None]
+    if not valid_results:
+        return {"crimson_score": float("nan"), "crimson_valid_samples": 0, "crimson_failed_samples": len(results)}
+
+    scores = [float(result["crimson_score"]) for result in valid_results]
+    error_count_keys = (
+        "false_findings",
+        "missing_findings",
+        "attribute_errors",
+        "location_errors",
+        "severity_errors",
+        "descriptor_errors",
+        "measurement_errors",
+        "certainty_errors",
+        "unspecific_errors",
+        "overinterpretation_errors",
+        "temporal_errors",
+    )
+    aggregate: dict[str, Any] = {
+        "crimson_score": sum(scores) / len(scores),
+        "crimson_valid_samples": len(valid_results),
+        "crimson_failed_samples": len(results) - len(valid_results),
+    }
+    for key in error_count_keys:
+        values = [float(result.get("error_counts", {}).get(key, 0.0)) for result in valid_results]
+        aggregate[f"crimson_{key}"] = sum(values) / len(values)
+    for key in ("false_findings", "missing_findings", "attribute_errors"):
+        values = [float(result.get("weighted_error_counts", {}).get(key, 0.0)) for result in valid_results]
+        aggregate[f"crimson_weighted_{key}"] = sum(values) / len(values)
+    for key in ("N_G", "E_penalty", "correct", "errors_more_than_correct", "S"):
+        values = [float(result.get("metrics", {}).get(key, 0.0)) for result in valid_results]
+        aggregate[f"crimson_{key}"] = sum(values) / len(values)
+    return aggregate
 
 
 def make_prediction_index(records: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
@@ -755,6 +980,11 @@ def evaluate_rows(
     green_batch_size: int,
     green_max_length: int,
     skip_green_score: bool = False,
+    crimson_api: str = "hf",
+    crimson_model_name: str | None = None,
+    crimson_batch_size: int = 1,
+    crimson_include_guidelines: bool = True,
+    skip_crimson_score: bool = False,
 ) -> dict[str, Any]:
     task_rows: dict[str, list[tuple[dict[str, Any], dict[str, Any] | None]]] = {}
     missing = []
@@ -781,31 +1011,95 @@ def evaluate_rows(
         metric_name = TASK_METRIC[task_type]
 
         if task_type == "disease_diagnosis_classification":
-            metric_value = balanced_accuracy_score([normalize_text(v) for v in gold_values], [normalize_text(v) for v in pred_values])
+            normalized_gold = [normalize_text(v) for v in gold_values]
+            normalized_pred = [normalize_text(v) for v in pred_values]
+            task_metrics = {
+                "balanced_accuracy": balanced_accuracy_score(normalized_gold, normalized_pred),
+                "accuracy": accuracy_score(normalized_gold, normalized_pred),
+                "f1_score": weighted_f1_score(normalized_gold, normalized_pred),
+                "valid_samples": len(pairs),
+            }
+            metric_value = task_metrics["balanced_accuracy"]
             flat_metrics["balanced_accuracy"] = metric_value
+            flat_metrics["classification_accuracy"] = task_metrics["accuracy"]
+            flat_metrics["classification_f1_score"] = task_metrics["f1_score"]
         elif task_type == "multi_label_classification":
-            metric_value = example_f1_score([parse_multilabel(v) for v in gold_values], [parse_multilabel(v) for v in pred_values])
+            task_metrics = multilabel_metrics([parse_multilabel(v) for v in gold_values], [parse_multilabel(v) for v in pred_values])
+            task_metrics["valid_samples"] = len(pairs)
+            metric_value = task_metrics["f1_score"]
             flat_metrics["f1_score"] = metric_value
+            flat_metrics["multi_label_f1_score"] = task_metrics["f1_score"]
+            flat_metrics["multi_label_precision"] = task_metrics["precision"]
+            flat_metrics["multi_label_recall"] = task_metrics["recall"]
         elif task_type == "detection":
-            metric_value, counts = detection_f1_score(gold_values, pred_values, iou_threshold)
-            by_task[task_type] = {"metric": metric_name, "value": metric_value, "count": len(pairs), "matching": counts, "iou_threshold": iou_threshold}
+            task_metrics = detection_threshold_metrics(gold_values, pred_values)
+            task_metrics["valid_samples"] = len(pairs)
+            metric_value = task_metrics["f1_score"]
+            matching_metrics = task_metrics["detailed_metrics"].get(f"IoU_{iou_threshold:.1f}") or detection_metrics(gold_values, pred_values, iou_threshold)
+            counts = {key: matching_metrics[key] for key in ("tp", "fp", "fn")}
+            by_task[task_type] = {
+                "metric": metric_name,
+                "value": metric_value,
+                "count": len(pairs),
+                "metrics": task_metrics,
+                "matching": counts,
+                "iou_threshold": iou_threshold,
+            }
             flat_metrics["f1_iou_0.5"] = metric_value
+            flat_metrics["detection_f1_iou_0.5"] = metric_value
+            flat_metrics["detection_precision_iou_0.5"] = task_metrics["precision"]
+            flat_metrics["detection_recall_iou_0.5"] = task_metrics["recall"]
+            flat_metrics["detection_f1_iou_0.3"] = task_metrics["f1_score_at_03"]
+            flat_metrics["detection_precision_iou_0.3"] = task_metrics["precision_at_03"]
+            flat_metrics["detection_recall_iou_0.3"] = task_metrics["recall_at_03"]
+            flat_metrics["detection_average_f1"] = task_metrics["average_f1"]
+            flat_metrics["detection_average_precision"] = task_metrics["coco_style_metrics"]["average_precision"]
+            flat_metrics["detection_average_recall"] = task_metrics["coco_style_metrics"]["average_recall"]
+            for threshold_key, threshold_metrics in task_metrics["detailed_metrics"].items():
+                suffix = threshold_key.lower().replace("iou_", "iou_")
+                flat_metrics[f"detection_{suffix}_f1_score"] = threshold_metrics["f1_score"]
+                flat_metrics[f"detection_{suffix}_precision"] = threshold_metrics["precision"]
+                flat_metrics[f"detection_{suffix}_recall"] = threshold_metrics["recall"]
+                flat_metrics[f"detection_{suffix}_tp"] = threshold_metrics["tp"]
+                flat_metrics[f"detection_{suffix}_fp"] = threshold_metrics["fp"]
+                flat_metrics[f"detection_{suffix}_fn"] = threshold_metrics["fn"]
             continue
         elif task_type == "cell_counting":
-            metric_value = mae_with_parse_fallback(gold_values, pred_values)
+            task_metrics = numeric_metrics_with_parse_fallback(gold_values, pred_values)
+            task_metrics["valid_samples"] = len(pairs)
+            metric_value = task_metrics["mean_absolute_error"]
             flat_metrics["cell_counting_mean_absolute_error"] = metric_value
+            flat_metrics["cell_counting_root_mean_squared_error"] = task_metrics["root_mean_squared_error"]
         elif task_type == "regression":
-            metric_value = mae_with_parse_fallback(gold_values, pred_values)
+            task_metrics = numeric_metrics_with_parse_fallback(gold_values, pred_values)
+            task_metrics["valid_samples"] = len(pairs)
+            metric_value = task_metrics["mean_absolute_error"]
             flat_metrics["regression_mean_absolute_error"] = metric_value
+            flat_metrics["regression_root_mean_squared_error"] = task_metrics["root_mean_squared_error"]
         elif task_type == "report_generation":
             if skip_green_score:
                 metric_value = float("nan")
             else:
                 metric_value = green_score([str(v or "") for v in gold_values], [str(v or "") for v in pred_values], green_model_name, green_output_dir, green_batch_size, green_max_length)
             flat_metrics["green_score"] = metric_value
+            task_metrics = {"green_score": metric_value, "valid_samples": len(pairs)}
+            if skip_crimson_score:
+                task_metrics["crimson_score"] = float("nan")
+            else:
+                crimson_metrics = crimson_score(
+                    [str(v or "") for v in gold_values],
+                    [str(v or "") for v in pred_values],
+                    [row for row, _ in pairs],
+                    api=crimson_api,
+                    model_name=crimson_model_name,
+                    batch_size=crimson_batch_size,
+                    include_guidelines=crimson_include_guidelines,
+                )
+                task_metrics.update(crimson_metrics)
+            flat_metrics["crimson_score"] = task_metrics["crimson_score"]
         else:
             raise AssertionError(f"Unhandled task type: {task_type}")
-        by_task[task_type] = {"metric": metric_name, "value": metric_value, "count": len(pairs)}
+        by_task[task_type] = {"metric": metric_name, "value": metric_value, "count": len(pairs), "metrics": task_metrics}
 
     return {"metrics": flat_metrics, "by_task": by_task, "num_rows": len(ground_truth_rows), "num_tasks": len(by_task)}
 
@@ -860,6 +1154,10 @@ def aggregate_split_results(split_results: Mapping[str, Mapping[str, Any]]) -> d
 
 
 def mae_with_parse_fallback(gold_values: Sequence[Any], pred_values: Sequence[Any]) -> float:
+    return numeric_metrics_with_parse_fallback(gold_values, pred_values)["mean_absolute_error"]
+
+
+def numeric_metrics_with_parse_fallback(gold_values: Sequence[Any], pred_values: Sequence[Any]) -> dict[str, float]:
     gold_numbers = [parse_numeric(value) for value in gold_values]
     pred_numbers = []
     for value in pred_values:
@@ -867,7 +1165,10 @@ def mae_with_parse_fallback(gold_values: Sequence[Any], pred_values: Sequence[An
             pred_numbers.append(parse_numeric(value))
         except ValueError:
             pred_numbers.append(0.0)
-    return mean_absolute_error(gold_numbers, pred_numbers)
+    return {
+        "mean_absolute_error": mean_absolute_error(gold_numbers, pred_numbers),
+        "root_mean_squared_error": root_mean_squared_error(gold_numbers, pred_numbers),
+    }
 
 
 def print_summary(results: Mapping[str, Any], console: Console) -> None:

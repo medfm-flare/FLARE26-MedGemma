@@ -26,6 +26,7 @@ dependencies = [
     "trl",
     "wandb",
     "green_score @ git+https://github.com/ATATC/GREEN.git",
+    "crimson-score",
 ]
 
 [tool.hatch.metadata]

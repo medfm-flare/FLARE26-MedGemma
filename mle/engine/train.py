@@ -538,6 +538,7 @@ def normalize_task_type(row: dict[str, Any]) -> str:
         "cls": "disease_diagnosis_classification",
         "multi_label": "multi_label_classification",
         "multilabel": "multi_label_classification",
+        "instance_detection": "detection",
         "count": "cell_counting",
         "counting": "cell_counting",
         "report": "report_generation",
