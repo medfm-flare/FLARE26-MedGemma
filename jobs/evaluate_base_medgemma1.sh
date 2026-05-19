@@ -3,10 +3,10 @@
 #SBATCH --account=rrg-jma
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
-#SBATCH --gpus-per-node=nvidia_h100_80gb_hbm3_3g.40gb:1
+#SBATCH --gpus-per-node=h100:1
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=8G
-#SBATCH --time=04:00:00
+#SBATCH --time=16:00:00
 #SBATCH --output=logs/%x_%j.out
 #SBATCH --error=logs/%x_%j.err
 
@@ -103,11 +103,11 @@ base_model: true
 allow_missing_predictions: ${ALLOW_MISSING_PREDICTIONS:-false}
 iou_threshold: ${IOU_THRESHOLD:-0.5}
 green_model_name: StanfordAIMI/GREEN-radllama2-7b
-green_batch_size: ${GREEN_BATCH_SIZE:-12}
+green_batch_size: ${GREEN_BATCH_SIZE:-32}
 green_max_length: ${GREEN_MAX_LENGTH:-2048}
 crimson_api: ${CRIMSON_API:-hf}
 crimson_model_name: ${CRIMSON_MODEL_NAME:-}
-crimson_batch_size: ${CRIMSON_BATCH_SIZE:-1}
+crimson_batch_size: ${CRIMSON_BATCH_SIZE:-32}
 skip_crimson_score: ${SKIP_CRIMSON_SCORE:-false}
 YAML
 
