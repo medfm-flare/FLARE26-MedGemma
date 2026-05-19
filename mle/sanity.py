@@ -10,13 +10,13 @@ from mle.engine import check_dataset, check_preprocessed_dataset
 from mle.vars import ExpConfig
 
 
-def check_environment(config: ExpConfig, *, fn_pdc: Callable[[ExpConfig], str] = check_preprocessed_dataset) -> dict[
-    str, Any]:
+def check_environment(config: ExpConfig, *, fn_cd: Callable[[ExpConfig], str] = check_dataset,
+                      fn_cpd: Callable[[ExpConfig], str] = check_preprocessed_dataset) -> dict[str, Any]:
     try:
         gpus = get_all_gpu_info()
     except NVMLError:
         gpus = {}
-    return {"dataset": check_dataset(config), "preprocessed_dataset": fn_pdc(config), "gpus": gpus,
+    return {"dataset": fn_cd(config), "preprocessed_dataset": fn_cpd(config), "gpus": gpus,
             "cuda": torch.version.cuda}
 
 
