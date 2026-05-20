@@ -70,11 +70,13 @@ PANELS: tuple[Panel, ...] = (
     ),
     Panel(
         title="Report Generation",
-        primary="Green Score",
-        metrics=(
-            ("Green Score", "green_score"),
-            ("CRIMSON Score", "crimson_score"),
-        ),
+        primary="GREEN Score",
+        metrics=(("GREEN Score", "green_score"),),
+    ),
+    Panel(
+        title="CRIMSON",
+        primary="CRIMSON Score",
+        metrics=(("CRIMSON Score", "crimson_score"),),
     ),
     Panel(
         title="Counting",
@@ -98,7 +100,7 @@ DEFAULT_RUNS: tuple[tuple[str, str, str], ...] = (
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Generate a six-task performance comparison plot from evaluation scores.json files."
+        description="Generate a seven-panel performance comparison plot from evaluation scores.json files."
     )
     parser.add_argument("--output-root", type=Path, default=Path("output"), help="Directory containing *-eval folders.")
     parser.add_argument(
@@ -200,6 +202,7 @@ def wrap_label(label: str) -> list[str]:
         "Mean Absolute Error": ["Mean Absolute", "Error"],
         "Root Mean Squared Error": ["Root Mean", "Squared Error"],
         "Balanced Accuracy": ["Balanced", "Accuracy"],
+        "GREEN Score": ["GREEN", "Score"],
         "CRIMSON Score": ["CRIMSON", "Score"],
     }
     return manual_wraps.get(label, [label])
@@ -273,15 +276,15 @@ def render_panel(
     metric_labels = [label for label, _key in panel.metrics]
     all_values = [metrics_by_run[run.label].get(key, float("nan")) for key in keys for run in runs]
     log_scale = should_use_log(all_values, panel, auto_log)
-    plot_x = panel_x + 72
-    plot_y = panel_y + 74
-    plot_width = panel_width - 98
-    plot_height = panel_height - 190
+    plot_x = panel_x + 104
+    plot_y = panel_y + 104
+    plot_width = panel_width - 140
+    plot_height = panel_height - 250
     baseline_y = plot_y + plot_height
     pieces = [
         rect(panel_x, panel_y, panel_width, panel_height, "#e9e9f2"),
-        text(panel_x + panel_width / 2, panel_y + 26, panel.title, size=20, weight="700"),
-        text(panel_x + panel_width / 2, panel_y + 50, f"(Primary: {panel.primary})", size=16, weight="700"),
+        text(panel_x + panel_width / 2, panel_y + 38, panel.title, size=30, weight="700"),
+        text(panel_x + panel_width / 2, panel_y + 72, f"(Primary: {panel.primary})", size=23, weight="700"),
     ]
 
     values = finite_values(all_values)
@@ -310,11 +313,11 @@ def render_panel(
             continue
         y = y_for(tick)
         pieces.append(line(plot_x, y, plot_x + plot_width, y, stroke="#ffffff", width=1))
-        pieces.append(text(plot_x - 10, y + 4, format_value(tick), size=10, anchor="end", fill="#333333"))
-    pieces.append(line(plot_x, plot_y, plot_x, baseline_y, stroke="#555555", width=1.2))
-    pieces.append(line(plot_x, baseline_y, plot_x + plot_width, baseline_y, stroke="#555555", width=1.2))
+        pieces.append(text(plot_x - 16, y + 6, format_value(tick), size=16, anchor="end", fill="#333333"))
+    pieces.append(line(plot_x, plot_y, plot_x, baseline_y, stroke="#555555", width=1.6))
+    pieces.append(line(plot_x, baseline_y, plot_x + plot_width, baseline_y, stroke="#555555", width=1.6))
     y_label = "Value (log scale)" if log_scale else "Value"
-    pieces.append(text(panel_x + 22, plot_y + plot_height / 2, y_label, size=13, rotate=-90))
+    pieces.append(text(panel_x + 35, plot_y + plot_height / 2, y_label, size=21, rotate=-90))
 
     group_width = plot_width / len(keys)
     bar_area_width = group_width * 0.72
@@ -331,25 +334,25 @@ def render_panel(
             bar_top = y_for(value)
             bar_height = max(1.0, baseline_y - bar_top)
             pieces.append(rect(bar_x + 1, bar_top, bar_width - 2, bar_height, run.color, opacity=0.88))
-            if bar_height > 64:
+            if bar_height > 84:
                 pieces.append(
                     text(
                         bar_x + bar_width / 2,
                         bar_top + bar_height / 2,
                         format_value(value),
-                        size=10,
+                        size=17,
                         weight="700",
                         fill="#ffffff",
                         rotate=-90,
                     )
                 )
-            elif bar_height > 18 and bar_width >= 42:
+            elif bar_height > 28 and bar_width >= 42:
                 pieces.append(
                     text(
                         bar_x + bar_width / 2,
-                        max(plot_y + 12, bar_top - 8),
+                        max(plot_y + 18, bar_top - 12),
                         format_value(value),
-                        size=9,
+                        size=15,
                         weight="700",
                         fill="#2b2b2b",
                     )
@@ -365,35 +368,39 @@ def render_panel(
             if not math.isfinite(ft_value):
                 continue
             ft_x = x_start + ft_index * bar_width + bar_width / 2
-            pieces.append(text(ft_x, max(plot_y + 14, y_for(ft_value) - 20), delta, size=10, weight="700"))
+            pieces.append(text(ft_x, max(plot_y + 22, y_for(ft_value) - 30), delta, size=16, weight="700"))
 
-        pieces.append(multiline_text(group_center, baseline_y + 36, wrap_label(metric_label), size=11, line_height=14))
+        pieces.append(multiline_text(group_center, baseline_y + 54, wrap_label(metric_label), size=19, line_height=23))
     return "\n".join(pieces)
 
 
 def render_svg(runs: list[Run], metrics_by_run: dict[str, dict[str, float]], auto_log: bool) -> str:
     width = 2400
-    height = 1550
-    margin_x = 70
-    margin_y = 135
-    gap_x = 70
-    gap_y = 90
-    panel_width = (width - 2 * margin_x - 2 * gap_x) / 3
-    panel_height = (height - margin_y - 60 - gap_y) / 2
+    height = 3600
+    columns = 2
+    margin_x = 95
+    margin_y = 165
+    bottom_margin = 90
+    gap_x = 90
+    gap_y = 105
+    rows = math.ceil(len(PANELS) / columns)
+    panel_width = (width - 2 * margin_x - (columns - 1) * gap_x) / columns
+    panel_height = (height - margin_y - bottom_margin - (rows - 1) * gap_y) / rows
     pieces = [
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" '
-        f'viewBox="0 0 {width} {height}" preserveAspectRatio="xMidYMid meet" style="background:#ffffff">',
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+        f'viewBox="0 0 {width} {height}" preserveAspectRatio="xMidYMid meet" '
+        f'style="max-width:100%;height:auto;background:#ffffff">',
         rect(0, 0, width, height, "#ffffff"),
-        text(width / 2, 42, "Model Performance Comparison: Base vs Finetuned", size=30, weight="700"),
+        text(width / 2, 58, "Model Performance Comparison: Base vs Finetuned", size=43, weight="700"),
     ]
-    legend_width = 150 * len(runs)
+    legend_width = 230 * len(runs)
     legend_x = width / 2 - legend_width / 2
     for index, run in enumerate(runs):
-        item_x = legend_x + index * 150
-        pieces.append(rect(item_x, 72, 30, 12, run.color, opacity=0.88))
-        pieces.append(text(item_x + 40, 83, run.label, size=13, anchor="start"))
+        item_x = legend_x + index * 230
+        pieces.append(rect(item_x, 96, 42, 18, run.color, opacity=0.88))
+        pieces.append(text(item_x + 58, 112, run.label, size=22, anchor="start"))
     for index, panel in enumerate(PANELS):
-        row, col = divmod(index, 3)
+        row, col = divmod(index, columns)
         x = margin_x + col * (panel_width + gap_x)
         y = margin_y + row * (panel_height + gap_y)
         pieces.append(
