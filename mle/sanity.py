@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Callable
 
 import torch
 from erbium.api import get_all_gpu_info
@@ -10,15 +10,14 @@ from mle.engine import check_dataset, check_preprocessed_dataset
 from mle.vars import ExpConfig
 
 
-def check_environment(config: ExpConfig) -> dict[str, Any]:
+def check_environment(config: ExpConfig, *, fn_cd: Callable[[ExpConfig], str] = check_dataset,
+                      fn_cpd: Callable[[ExpConfig], str] = check_preprocessed_dataset) -> dict[str, Any]:
     try:
         gpus = get_all_gpu_info()
     except NVMLError:
         gpus = {}
-    return {
-        "dataset": check_dataset(config), "preprocessed_dataset": check_preprocessed_dataset(config), "gpus": gpus,
-        "cuda": torch.version.cuda
-    }
+    return {"dataset": fn_cd(config), "preprocessed_dataset": fn_cpd(config), "gpus": gpus,
+            "cuda": torch.version.cuda}
 
 
 def print_environment_check_results(results: dict[str, Any], *, console: Console = Console()) -> None:
