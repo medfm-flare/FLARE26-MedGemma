@@ -1,4 +1,4 @@
-# MedGemma-FLARE-2D
+# FLARE26-MedGemma
 
 ## 🚀 Quick Start
 
