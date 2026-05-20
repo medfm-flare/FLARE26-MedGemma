@@ -1,0 +1,260 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 2400 1550" preserveAspectRatio="xMidYMid meet" style="background:#ffffff">
+<rect x="0.0" y="0.0" width="2400.0" height="1550.0" fill="#ffffff" opacity="1.00" />
+<text x="1200.0" y="42.0" font-size="30" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">Model Performance Comparison: Base vs Finetuned</text>
+<rect x="900.0" y="72.0" width="30.0" height="12.0" fill="#ef7f9a" opacity="0.88" />
+<text x="940.0" y="83.0" font-size="13" font-weight="400" fill="#2b2b2b" text-anchor="start" font-family="Arial, Helvetica, sans-serif">Base MG1</text>
+<rect x="1050.0" y="72.0" width="30.0" height="12.0" fill="#c7aa4b" opacity="0.88" />
+<text x="1090.0" y="83.0" font-size="13" font-weight="400" fill="#2b2b2b" text-anchor="start" font-family="Arial, Helvetica, sans-serif">FT MG1</text>
+<rect x="1200.0" y="72.0" width="30.0" height="12.0" fill="#6fa8dc" opacity="0.88" />
+<text x="1240.0" y="83.0" font-size="13" font-weight="400" fill="#2b2b2b" text-anchor="start" font-family="Arial, Helvetica, sans-serif">Base MG1.5</text>
+<rect x="1350.0" y="72.0" width="30.0" height="12.0" fill="#8fbc6a" opacity="0.88" />
+<text x="1390.0" y="83.0" font-size="13" font-weight="400" fill="#2b2b2b" text-anchor="start" font-family="Arial, Helvetica, sans-serif">FT MG1.5</text>
+<rect x="70.0" y="135.0" width="706.7" height="632.5" fill="#e9e9f2" opacity="1.00" />
+<text x="423.3" y="161.0" font-size="20" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">Classification</text>
+<text x="423.3" y="185.0" font-size="16" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">(Primary: Balanced Accuracy)</text>
+<line x1="142.0" y1="651.5" x2="750.7" y2="651.5" stroke="#ffffff" stroke-width="1.0" />
+<text x="132.0" y="655.5" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0</text>
+<line x1="142.0" y1="563.0" x2="750.7" y2="563.0" stroke="#ffffff" stroke-width="1.0" />
+<text x="132.0" y="567.0" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0.200</text>
+<line x1="142.0" y1="474.5" x2="750.7" y2="474.5" stroke="#ffffff" stroke-width="1.0" />
+<text x="132.0" y="478.5" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0.400</text>
+<line x1="142.0" y1="386.0" x2="750.7" y2="386.0" stroke="#ffffff" stroke-width="1.0" />
+<text x="132.0" y="390.0" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0.600</text>
+<line x1="142.0" y1="297.5" x2="750.7" y2="297.5" stroke="#ffffff" stroke-width="1.0" />
+<text x="132.0" y="301.5" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0.800</text>
+<line x1="142.0" y1="209.0" x2="750.7" y2="209.0" stroke="#ffffff" stroke-width="1.0" />
+<text x="132.0" y="213.0" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">1.000</text>
+<line x1="142.0" y1="209.0" x2="142.0" y2="651.5" stroke="#555555" stroke-width="1.2" />
+<line x1="142.0" y1="651.5" x2="750.7" y2="651.5" stroke="#555555" stroke-width="1.2" />
+<text x="92.0" y="430.2" font-size="13" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 92.0 430.2)">Value</text>
+<rect x="171.4" y="528.5" width="34.5" height="123.0" fill="#ef7f9a" opacity="0.88" />
+<text x="188.7" y="590.0" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 188.7 590.0)">0.278</text>
+<rect x="207.9" y="334.8" width="34.5" height="316.7" fill="#c7aa4b" opacity="0.88" />
+<text x="225.2" y="493.1" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 225.2 493.1)">0.716</text>
+<rect x="244.4" y="639.3" width="34.5" height="12.2" fill="#6fa8dc" opacity="0.88" />
+<rect x="281.0" y="317.6" width="34.5" height="333.9" fill="#8fbc6a" opacity="0.88" />
+<text x="298.2" y="484.6" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 298.2 484.6)">0.755</text>
+<text x="225.2" y="314.8" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+157%</text>
+<text x="298.2" y="297.6" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+2642%</text>
+<text x="243.4" y="687.5" font-size="11" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"><tspan x="243.4" dy="0.0">Accuracy</tspan></text>
+<rect x="374.3" y="588.3" width="34.5" height="63.2" fill="#ef7f9a" opacity="0.88" />
+<rect x="410.8" y="359.4" width="34.5" height="292.1" fill="#c7aa4b" opacity="0.88" />
+<text x="428.1" y="505.5" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 428.1 505.5)">0.660</text>
+<rect x="447.3" y="644.7" width="34.5" height="6.8" fill="#6fa8dc" opacity="0.88" />
+<rect x="483.9" y="342.9" width="34.5" height="308.6" fill="#8fbc6a" opacity="0.88" />
+<text x="501.1" y="497.2" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 501.1 497.2)">0.697</text>
+<text x="428.1" y="339.4" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+362%</text>
+<text x="501.1" y="322.9" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+4443%</text>
+<text x="446.3" y="687.5" font-size="11" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"><tspan x="446.3" dy="0.0">Balanced</tspan><tspan x="446.3" dy="14.0">Accuracy</tspan></text>
+<rect x="577.2" y="530.8" width="34.5" height="120.7" fill="#ef7f9a" opacity="0.88" />
+<text x="594.4" y="591.2" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 594.4 591.2)">0.273</text>
+<rect x="613.7" y="337.3" width="34.5" height="314.2" fill="#c7aa4b" opacity="0.88" />
+<text x="631.0" y="494.4" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 631.0 494.4)">0.710</text>
+<rect x="650.2" y="637.5" width="34.5" height="14.0" fill="#6fa8dc" opacity="0.88" />
+<rect x="686.7" y="320.2" width="34.5" height="331.3" fill="#8fbc6a" opacity="0.88" />
+<text x="704.0" y="485.9" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 704.0 485.9)">0.749</text>
+<text x="631.0" y="317.3" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+160%</text>
+<text x="704.0" y="300.2" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+2266%</text>
+<text x="649.2" y="687.5" font-size="11" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"><tspan x="649.2" dy="0.0">F1 Score</tspan></text>
+<rect x="846.7" y="135.0" width="706.7" height="632.5" fill="#e9e9f2" opacity="1.00" />
+<text x="1200.0" y="161.0" font-size="20" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">Detection</text>
+<text x="1200.0" y="185.0" font-size="16" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">(Primary: F1 Score)</text>
+<line x1="918.7" y1="651.5" x2="1527.3" y2="651.5" stroke="#ffffff" stroke-width="1.0" />
+<text x="908.7" y="655.5" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0</text>
+<line x1="918.7" y1="540.9" x2="1527.3" y2="540.9" stroke="#ffffff" stroke-width="1.0" />
+<text x="908.7" y="544.9" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0.050</text>
+<line x1="918.7" y1="430.2" x2="1527.3" y2="430.2" stroke="#ffffff" stroke-width="1.0" />
+<text x="908.7" y="434.2" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0.100</text>
+<line x1="918.7" y1="319.6" x2="1527.3" y2="319.6" stroke="#ffffff" stroke-width="1.0" />
+<text x="908.7" y="323.6" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0.150</text>
+<line x1="918.7" y1="209.0" x2="1527.3" y2="209.0" stroke="#ffffff" stroke-width="1.0" />
+<text x="908.7" y="213.0" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0.200</text>
+<line x1="918.7" y1="209.0" x2="918.7" y2="651.5" stroke="#555555" stroke-width="1.2" />
+<line x1="918.7" y1="651.5" x2="1527.3" y2="651.5" stroke="#555555" stroke-width="1.2" />
+<text x="868.7" y="430.2" font-size="13" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 868.7 430.2)">Value</text>
+<rect x="948.1" y="638.1" width="34.5" height="13.4" fill="#ef7f9a" opacity="0.88" />
+<rect x="984.6" y="380.7" width="34.5" height="270.8" fill="#c7aa4b" opacity="0.88" />
+<text x="1001.9" y="516.1" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1001.9 516.1)">0.122</text>
+<rect x="1021.1" y="649.8" width="34.5" height="1.7" fill="#6fa8dc" opacity="0.88" />
+<rect x="1057.6" y="361.3" width="34.5" height="290.2" fill="#8fbc6a" opacity="0.88" />
+<text x="1074.9" y="506.4" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1074.9 506.4)">0.131</text>
+<text x="1001.9" y="360.7" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+1919%</text>
+<text x="1074.9" y="341.3" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+17349%</text>
+<text x="1020.1" y="687.5" font-size="11" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"><tspan x="1020.1" dy="0.0">Precision</tspan></text>
+<rect x="1151.0" y="642.2" width="34.5" height="9.3" fill="#ef7f9a" opacity="0.88" />
+<rect x="1187.5" y="493.0" width="34.5" height="158.5" fill="#c7aa4b" opacity="0.88" />
+<text x="1204.7" y="572.2" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1204.7 572.2)">0.072</text>
+<rect x="1224.0" y="647.4" width="34.5" height="4.1" fill="#6fa8dc" opacity="0.88" />
+<rect x="1260.5" y="473.3" width="34.5" height="178.2" fill="#8fbc6a" opacity="0.88" />
+<text x="1277.8" y="562.4" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1277.8 562.4)">0.081</text>
+<text x="1204.7" y="473.0" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+1601%</text>
+<text x="1277.8" y="453.3" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+4222%</text>
+<text x="1223.0" y="687.5" font-size="11" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"><tspan x="1223.0" dy="0.0">Recall</tspan></text>
+<rect x="1353.8" y="642.2" width="34.5" height="9.3" fill="#ef7f9a" opacity="0.88" />
+<rect x="1390.4" y="466.9" width="34.5" height="184.6" fill="#c7aa4b" opacity="0.88" />
+<text x="1407.6" y="559.2" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1407.6 559.2)">0.083</text>
+<rect x="1426.9" y="649.9" width="34.5" height="1.6" fill="#6fa8dc" opacity="0.88" />
+<rect x="1463.4" y="447.5" width="34.5" height="204.0" fill="#8fbc6a" opacity="0.88" />
+<text x="1480.7" y="549.5" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1480.7 549.5)">0.092</text>
+<text x="1407.6" y="446.9" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+1892%</text>
+<text x="1480.7" y="427.5" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+12560%</text>
+<text x="1425.9" y="687.5" font-size="11" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"><tspan x="1425.9" dy="0.0">F1 Score</tspan></text>
+<rect x="1623.3" y="135.0" width="706.7" height="632.5" fill="#e9e9f2" opacity="1.00" />
+<text x="1976.7" y="161.0" font-size="20" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">Regression</text>
+<text x="1976.7" y="185.0" font-size="16" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">(Primary: Mean Absolute Error)</text>
+<line x1="1695.3" y1="651.5" x2="2304.0" y2="651.5" stroke="#ffffff" stroke-width="1.0" />
+<text x="1685.3" y="655.5" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0</text>
+<line x1="1695.3" y1="563.0" x2="2304.0" y2="563.0" stroke="#ffffff" stroke-width="1.0" />
+<text x="1685.3" y="567.0" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">10.000</text>
+<line x1="1695.3" y1="474.5" x2="2304.0" y2="474.5" stroke="#ffffff" stroke-width="1.0" />
+<text x="1685.3" y="478.5" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">20.000</text>
+<line x1="1695.3" y1="386.0" x2="2304.0" y2="386.0" stroke="#ffffff" stroke-width="1.0" />
+<text x="1685.3" y="390.0" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">30.000</text>
+<line x1="1695.3" y1="297.5" x2="2304.0" y2="297.5" stroke="#ffffff" stroke-width="1.0" />
+<text x="1685.3" y="301.5" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">40.000</text>
+<line x1="1695.3" y1="209.0" x2="2304.0" y2="209.0" stroke="#ffffff" stroke-width="1.0" />
+<text x="1685.3" y="213.0" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">50.000</text>
+<line x1="1695.3" y1="209.0" x2="1695.3" y2="651.5" stroke="#555555" stroke-width="1.2" />
+<line x1="1695.3" y1="651.5" x2="2304.0" y2="651.5" stroke="#555555" stroke-width="1.2" />
+<text x="1645.3" y="430.2" font-size="13" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1645.3 430.2)">Value</text>
+<rect x="1738.9" y="426.6" width="52.8" height="224.9" fill="#ef7f9a" opacity="0.88" />
+<text x="1765.3" y="539.0" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1765.3 539.0)">25.416</text>
+<rect x="1793.7" y="492.2" width="52.8" height="159.3" fill="#c7aa4b" opacity="0.88" />
+<text x="1820.1" y="571.8" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1820.1 571.8)">18.005</text>
+<rect x="1848.5" y="401.9" width="52.8" height="249.6" fill="#6fa8dc" opacity="0.88" />
+<text x="1874.9" y="526.7" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1874.9 526.7)">28.208</text>
+<rect x="1903.3" y="492.1" width="52.8" height="159.4" fill="#8fbc6a" opacity="0.88" />
+<text x="1929.7" y="571.8" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1929.7 571.8)">18.009</text>
+<text x="1820.1" y="472.2" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+29%</text>
+<text x="1929.7" y="472.1" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+36%</text>
+<text x="1847.5" y="687.5" font-size="11" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"><tspan x="1847.5" dy="0.0">Mean Absolute</tspan><tspan x="1847.5" dy="14.0">Error</tspan></text>
+<rect x="2043.3" y="307.8" width="52.8" height="343.7" fill="#ef7f9a" opacity="0.88" />
+<text x="2069.7" y="479.7" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 2069.7 479.7)">38.835</text>
+<rect x="2098.1" y="402.1" width="52.8" height="249.4" fill="#c7aa4b" opacity="0.88" />
+<text x="2124.4" y="526.8" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 2124.4 526.8)">28.186</text>
+<rect x="2152.8" y="294.7" width="52.8" height="356.8" fill="#6fa8dc" opacity="0.88" />
+<text x="2179.2" y="473.1" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 2179.2 473.1)">40.321</text>
+<rect x="2207.6" y="402.9" width="52.8" height="248.6" fill="#8fbc6a" opacity="0.88" />
+<text x="2234.0" y="527.2" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 2234.0 527.2)">28.093</text>
+<text x="2124.4" y="382.1" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+27%</text>
+<text x="2234.0" y="382.9" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+30%</text>
+<text x="2151.8" y="687.5" font-size="11" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"><tspan x="2151.8" dy="0.0">Root Mean</tspan><tspan x="2151.8" dy="14.0">Squared Error</tspan></text>
+<rect x="70.0" y="857.5" width="706.7" height="632.5" fill="#e9e9f2" opacity="1.00" />
+<text x="423.3" y="883.5" font-size="20" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">Multi Label</text>
+<text x="423.3" y="907.5" font-size="16" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">(Primary: F1 Score)</text>
+<line x1="142.0" y1="1374.0" x2="750.7" y2="1374.0" stroke="#ffffff" stroke-width="1.0" />
+<text x="132.0" y="1378.0" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0</text>
+<line x1="142.0" y1="1263.4" x2="750.7" y2="1263.4" stroke="#ffffff" stroke-width="1.0" />
+<text x="132.0" y="1267.4" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0.200</text>
+<line x1="142.0" y1="1152.8" x2="750.7" y2="1152.8" stroke="#ffffff" stroke-width="1.0" />
+<text x="132.0" y="1156.8" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0.400</text>
+<line x1="142.0" y1="1042.1" x2="750.7" y2="1042.1" stroke="#ffffff" stroke-width="1.0" />
+<text x="132.0" y="1046.1" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0.600</text>
+<line x1="142.0" y1="931.5" x2="750.7" y2="931.5" stroke="#ffffff" stroke-width="1.0" />
+<text x="132.0" y="935.5" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0.800</text>
+<line x1="142.0" y1="931.5" x2="142.0" y2="1374.0" stroke="#555555" stroke-width="1.2" />
+<line x1="142.0" y1="1374.0" x2="750.7" y2="1374.0" stroke="#555555" stroke-width="1.2" />
+<text x="92.0" y="1152.8" font-size="13" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 92.0 1152.8)">Value</text>
+<rect x="171.4" y="1210.8" width="34.5" height="163.2" fill="#ef7f9a" opacity="0.88" />
+<text x="188.7" y="1292.4" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 188.7 1292.4)">0.295</text>
+<rect x="207.9" y="1094.7" width="34.5" height="279.3" fill="#c7aa4b" opacity="0.88" />
+<text x="225.2" y="1234.3" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 225.2 1234.3)">0.505</text>
+<rect x="244.4" y="1317.1" width="34.5" height="56.9" fill="#6fa8dc" opacity="0.88" />
+<rect x="281.0" y="1086.6" width="34.5" height="287.4" fill="#8fbc6a" opacity="0.88" />
+<text x="298.2" y="1230.3" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 298.2 1230.3)">0.520</text>
+<text x="225.2" y="1074.7" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+71%</text>
+<text x="298.2" y="1066.6" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+405%</text>
+<text x="243.4" y="1410.0" font-size="11" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"><tspan x="243.4" dy="0.0">Precision</tspan></text>
+<rect x="374.3" y="1177.5" width="34.5" height="196.5" fill="#ef7f9a" opacity="0.88" />
+<text x="391.6" y="1275.8" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 391.6 1275.8)">0.355</text>
+<rect x="410.8" y="1092.0" width="34.5" height="282.0" fill="#c7aa4b" opacity="0.88" />
+<text x="428.1" y="1233.0" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 428.1 1233.0)">0.510</text>
+<rect x="447.3" y="1107.2" width="34.5" height="266.8" fill="#6fa8dc" opacity="0.88" />
+<text x="464.6" y="1240.6" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 464.6 1240.6)">0.482</text>
+<rect x="483.9" y="1091.4" width="34.5" height="282.6" fill="#8fbc6a" opacity="0.88" />
+<text x="501.1" y="1232.7" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 501.1 1232.7)">0.511</text>
+<text x="428.1" y="1072.0" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+44%</text>
+<text x="501.1" y="1071.4" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+6%</text>
+<text x="446.3" y="1410.0" font-size="11" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"><tspan x="446.3" dy="0.0">Recall</tspan></text>
+<rect x="577.2" y="1216.4" width="34.5" height="157.6" fill="#ef7f9a" opacity="0.88" />
+<text x="594.4" y="1295.2" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 594.4 1295.2)">0.285</text>
+<rect x="613.7" y="1101.4" width="34.5" height="272.6" fill="#c7aa4b" opacity="0.88" />
+<text x="631.0" y="1237.7" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 631.0 1237.7)">0.493</text>
+<rect x="650.2" y="1288.8" width="34.5" height="85.2" fill="#6fa8dc" opacity="0.88" />
+<text x="667.5" y="1331.4" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 667.5 1331.4)">0.154</text>
+<rect x="686.7" y="1098.1" width="34.5" height="275.9" fill="#8fbc6a" opacity="0.88" />
+<text x="704.0" y="1236.1" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 704.0 1236.1)">0.499</text>
+<text x="631.0" y="1081.4" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+73%</text>
+<text x="704.0" y="1078.1" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+224%</text>
+<text x="649.2" y="1410.0" font-size="11" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"><tspan x="649.2" dy="0.0">F1 Score</tspan></text>
+<rect x="846.7" y="857.5" width="706.7" height="632.5" fill="#e9e9f2" opacity="1.00" />
+<text x="1200.0" y="883.5" font-size="20" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">Report Generation</text>
+<text x="1200.0" y="907.5" font-size="16" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">(Primary: Green Score)</text>
+<line x1="918.7" y1="1374.0" x2="1527.3" y2="1374.0" stroke="#ffffff" stroke-width="1.0" />
+<text x="908.7" y="1378.0" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0</text>
+<line x1="918.7" y1="1226.5" x2="1527.3" y2="1226.5" stroke="#ffffff" stroke-width="1.0" />
+<text x="908.7" y="1230.5" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">0.500</text>
+<line x1="918.7" y1="1079.0" x2="1527.3" y2="1079.0" stroke="#ffffff" stroke-width="1.0" />
+<text x="908.7" y="1083.0" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">1.000</text>
+<line x1="918.7" y1="931.5" x2="1527.3" y2="931.5" stroke="#ffffff" stroke-width="1.0" />
+<text x="908.7" y="935.5" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">1.500</text>
+<line x1="918.7" y1="931.5" x2="918.7" y2="1374.0" stroke="#555555" stroke-width="1.2" />
+<line x1="918.7" y1="1374.0" x2="1527.3" y2="1374.0" stroke="#555555" stroke-width="1.2" />
+<text x="868.7" y="1152.8" font-size="13" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 868.7 1152.8)">Value</text>
+<rect x="962.3" y="1139.1" width="52.8" height="234.9" fill="#ef7f9a" opacity="0.88" />
+<text x="988.7" y="1256.5" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 988.7 1256.5)">0.796</text>
+<rect x="1017.1" y="1159.4" width="52.8" height="214.6" fill="#c7aa4b" opacity="0.88" />
+<text x="1043.4" y="1266.7" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1043.4 1266.7)">0.728</text>
+<rect x="1071.8" y="1146.3" width="52.8" height="227.7" fill="#6fa8dc" opacity="0.88" />
+<text x="1098.2" y="1260.1" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1098.2 1260.1)">0.772</text>
+<rect x="1126.6" y="1158.5" width="52.8" height="215.5" fill="#8fbc6a" opacity="0.88" />
+<text x="1153.0" y="1266.3" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1153.0 1266.3)">0.730</text>
+<text x="1043.4" y="1139.4" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">-9%</text>
+<text x="1153.0" y="1138.5" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">-5%</text>
+<text x="1070.8" y="1410.0" font-size="11" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"><tspan x="1070.8" dy="0.0">Green Score</tspan></text>
+<rect x="1266.6" y="1146.8" width="52.8" height="227.2" fill="#ef7f9a" opacity="0.88" />
+<text x="1293.0" y="1260.4" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1293.0 1260.4)">0.770</text>
+<rect x="1321.4" y="1118.7" width="52.8" height="255.3" fill="#c7aa4b" opacity="0.88" />
+<text x="1347.8" y="1246.4" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1347.8 1246.4)">0.865</text>
+<rect x="1376.2" y="1168.2" width="52.8" height="205.8" fill="#6fa8dc" opacity="0.88" />
+<text x="1402.6" y="1271.1" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1402.6 1271.1)">0.698</text>
+<rect x="1430.9" y="1121.5" width="52.8" height="252.5" fill="#8fbc6a" opacity="0.88" />
+<text x="1457.3" y="1247.7" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1457.3 1247.7)">0.856</text>
+<text x="1347.8" y="1098.7" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+12%</text>
+<text x="1457.3" y="1101.5" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+23%</text>
+<text x="1375.2" y="1410.0" font-size="11" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"><tspan x="1375.2" dy="0.0">CRIMSON</tspan><tspan x="1375.2" dy="14.0">Score</tspan></text>
+<rect x="1623.3" y="857.5" width="706.7" height="632.5" fill="#e9e9f2" opacity="1.00" />
+<text x="1976.7" y="883.5" font-size="20" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">Counting</text>
+<text x="1976.7" y="907.5" font-size="16" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">(Primary: Mean Absolute Error)</text>
+<line x1="1695.3" y1="1374.0" x2="2304.0" y2="1374.0" stroke="#ffffff" stroke-width="1.0" />
+<text x="1685.3" y="1378.0" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">100.0</text>
+<line x1="1695.3" y1="1284.8" x2="2304.0" y2="1284.8" stroke="#ffffff" stroke-width="1.0" />
+<text x="1685.3" y="1288.8" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">1.00e+53</text>
+<line x1="1695.3" y1="1195.6" x2="2304.0" y2="1195.6" stroke="#ffffff" stroke-width="1.0" />
+<text x="1685.3" y="1199.6" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">1.00e+104</text>
+<line x1="1695.3" y1="1106.4" x2="2304.0" y2="1106.4" stroke="#ffffff" stroke-width="1.0" />
+<text x="1685.3" y="1110.4" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">1.00e+155</text>
+<line x1="1695.3" y1="1017.2" x2="2304.0" y2="1017.2" stroke="#ffffff" stroke-width="1.0" />
+<text x="1685.3" y="1021.2" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">1.00e+206</text>
+<line x1="1695.3" y1="931.5" x2="2304.0" y2="931.5" stroke="#ffffff" stroke-width="1.0" />
+<text x="1685.3" y="935.5" font-size="10" font-weight="400" fill="#333333" text-anchor="end" font-family="Arial, Helvetica, sans-serif">1.00e+255</text>
+<line x1="1695.3" y1="931.5" x2="1695.3" y2="1374.0" stroke="#555555" stroke-width="1.2" />
+<line x1="1695.3" y1="1374.0" x2="2304.0" y2="1374.0" stroke="#555555" stroke-width="1.2" />
+<text x="1645.3" y="1152.8" font-size="13" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1645.3 1152.8)">Value (log scale)</text>
+<rect x="1738.9" y="934.3" width="52.8" height="439.7" fill="#ef7f9a" opacity="0.88" />
+<text x="1765.3" y="1154.2" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 1765.3 1154.2)">2.47e+253</text>
+<rect x="1793.7" y="1373.2" width="52.8" height="1.0" fill="#c7aa4b" opacity="0.88" />
+<rect x="1848.5" y="1369.6" width="52.8" height="4.4" fill="#6fa8dc" opacity="0.88" />
+<rect x="1903.3" y="1373.2" width="52.8" height="1.0" fill="#8fbc6a" opacity="0.88" />
+<text x="1820.1" y="1353.2" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+100%</text>
+<text x="1929.7" y="1353.2" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+99%</text>
+<text x="1847.5" y="1410.0" font-size="11" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"><tspan x="1847.5" dy="0.0">Mean Absolute</tspan><tspan x="1847.5" dy="14.0">Error</tspan></text>
+<rect x="2043.3" y="932.8" width="52.8" height="441.2" fill="#ef7f9a" opacity="0.88" />
+<text x="2069.7" y="1153.4" font-size="10" font-weight="700" fill="#ffffff" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" transform="rotate(-90.0 2069.7 1153.4)">1.75e+254</text>
+<rect x="2098.1" y="1372.4" width="52.8" height="1.6" fill="#c7aa4b" opacity="0.88" />
+<rect x="2152.8" y="1368.3" width="52.8" height="5.7" fill="#6fa8dc" opacity="0.88" />
+<rect x="2207.6" y="1372.5" width="52.8" height="1.5" fill="#8fbc6a" opacity="0.88" />
+<text x="2124.4" y="1352.4" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+100%</text>
+<text x="2234.0" y="1352.5" font-size="10" font-weight="700" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif">+100%</text>
+<text x="2151.8" y="1410.0" font-size="11" font-weight="400" fill="#2b2b2b" text-anchor="middle" font-family="Arial, Helvetica, sans-serif"><tspan x="2151.8" dy="0.0">Root Mean</tspan><tspan x="2151.8" dy="14.0">Squared Error</tspan></text>
+</svg>
