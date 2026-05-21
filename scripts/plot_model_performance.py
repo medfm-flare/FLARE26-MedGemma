@@ -70,13 +70,11 @@ PANELS: tuple[Panel, ...] = (
     ),
     Panel(
         title="Report Generation",
-        primary="GREEN Score",
-        metrics=(("GREEN Score", "green_score"),),
-    ),
-    Panel(
-        title="CRIMSON",
-        primary="CRIMSON Score",
-        metrics=(("CRIMSON Score", "crimson_score"),),
+        primary="GREEN / CRIMSON Score",
+        metrics=(
+            ("GREEN Score", "green_score"),
+            ("CRIMSON Score", "crimson_score"),
+        ),
     ),
     Panel(
         title="Counting",
@@ -100,7 +98,7 @@ DEFAULT_RUNS: tuple[tuple[str, str, str], ...] = (
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Generate a seven-panel performance comparison plot from evaluation scores.json files."
+        description="Generate a six-panel performance comparison plot from evaluation scores.json files."
     )
     parser.add_argument("--output-root", type=Path, default=Path("output"), help="Directory containing *-eval folders.")
     parser.add_argument(
