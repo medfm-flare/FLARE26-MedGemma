@@ -167,7 +167,7 @@ def text(
     transform = f' transform="rotate({rotate:.1f} {x:.1f} {y:.1f})"' if rotate is not None else ""
     return (
         f'<text x="{x:.1f}" y="{y:.1f}" font-size="{size}" font-weight="{weight}" '
-        f'fill="{fill}" text-anchor="{anchor}" font-family="Arial, Helvetica, sans-serif"{transform}>'
+        f'fill="{fill}" text-anchor="{anchor}" font-family="Times New Roman, Times, serif"{transform}>'
         f"{html.escape(value)}</text>"
     )
 
@@ -190,7 +190,7 @@ def multiline_text(
         tspans.append(f'<tspan x="{x:.1f}" dy="{dy:.1f}">{line_text}</tspan>')
     return (
         f'<text x="{x:.1f}" y="{y:.1f}" font-size="{size}" font-weight="{weight}" '
-        f'fill="{fill}" text-anchor="{anchor}" font-family="Arial, Helvetica, sans-serif">'
+        f'fill="{fill}" text-anchor="{anchor}" font-family="Times New Roman, Times, serif">'
         f"{''.join(tspans)}</text>"
     )
 
