@@ -103,6 +103,7 @@ CONFIG_PATH="logs/configs/train_${SLURM_JOB_ID:-manual}.yaml"
 cat > "$CONFIG_PATH" <<YAML
 model_name_or_path: google/medgemma-4b-it
 model_output_dir: ${MODEL_OUTPUT_DIR}
+precision: ${PRECISION:-auto}
 image_size: ${IMAGE_SIZE:-896}
 resize_mode: square
 max_images_per_sample: 1

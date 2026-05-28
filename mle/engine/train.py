@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import inspect
 import json
+import math
 import os
 import random
 from dataclasses import dataclass
@@ -123,6 +124,7 @@ def train(
     per_device_eval_batch_size = int(kwargs.get("per_device_eval_batch_size", 1))
     gradient_accumulation_steps = int(kwargs.get("gradient_accumulation_steps", 1 if smoke_test else 16))
     max_steps = int(kwargs.get("max_steps", 2 if smoke_test else -1))
+    per_device_train_batch_size = int(kwargs.get("per_device_train_batch_size", batch_size))
     if smoke_test:
         console.print("Smoke test mode: limiting training samples, steps, and evaluation workload.")
 
@@ -132,9 +134,18 @@ def train(
     console.print(f"Loaded {len(train_dataset)} training row(s)" + (
         f" and {len(eval_dataset)} validation row(s)" if eval_dataset else ""))
 
-    dtype = choose_dtype()
+    dtype = choose_dtype(kwargs.get("precision", kwargs.get("torch_dtype", kwargs.get("dtype", "auto"))), console)
     attn_implementations = choose_attention_backends(str(kwargs.get("attn_implementation", "auto")))
     quant_config = make_quant_config(bool(kwargs.get("load_in_4bit", True)), dtype)
+    warmup_steps = resolve_warmup_steps(
+        kwargs.get("warmup_steps"),
+        kwargs.get("warmup_ratio", 0.03),
+        len(train_dataset),
+        per_device_train_batch_size,
+        gradient_accumulation_steps,
+        float(num_epochs),
+        max_steps,
+    )
 
     console.print(f"Loading {model_name_or_path} with attention={attn_label(attn_implementations[0])}")
     model = load_model_with_attention_fallback(
@@ -196,12 +207,12 @@ def train(
         run_name=str(kwargs.get("run_name", config.experiment_name)),
         num_train_epochs=float(num_epochs),
         max_steps=max_steps,
-        per_device_train_batch_size=int(kwargs.get("per_device_train_batch_size", batch_size)),
+        per_device_train_batch_size=per_device_train_batch_size,
         per_device_eval_batch_size=per_device_eval_batch_size,
         gradient_accumulation_steps=gradient_accumulation_steps,
         learning_rate=float(learning_rate),
         weight_decay=float(kwargs.get("weight_decay", 0.0)),
-        warmup_ratio=float(kwargs.get("warmup_ratio", 0.03)),
+        warmup_steps=warmup_steps,
         lr_scheduler_type=str(kwargs.get("lr_scheduler_type", "linear")),
         optim=str(kwargs.get("optim", "paged_adamw_8bit" if quant_config is not None else "adamw_torch_fused")),
         bf16=(dtype == torch.bfloat16),
@@ -248,6 +259,7 @@ def train(
         data_collator=collator,
         callbacks=callbacks,
     )
+    prepare_trainable_parameters_for_amp(trainer.model, dtype, console)
 
     console.print("Starting MedGemma LoRA fine-tuning")
     trainer.train(resume_from_checkpoint=kwargs.get("resume_from_checkpoint"))
@@ -279,6 +291,13 @@ def optional_int(value: Any) -> int | None:
         return None
     out = int(value)
     return out if out > 0 else None
+
+
+def optional_nonnegative_int(value: Any) -> int | None:
+    if value is None or value == "":
+        return None
+    out = int(value)
+    return out if out >= 0 else None
 
 
 def split_csv(value: Any) -> list[str]:
@@ -339,11 +358,113 @@ def make_sft_trainer_compat(**kwargs):
     return SFTTrainer(**config)
 
 
-def choose_dtype():
-    if torch.cuda.is_available():
+def choose_dtype(requested: Any = "auto", console: Console | None = None):
+    requested_text = str(requested or "auto").strip().lower()
+    aliases = {
+        "auto": "auto",
+        "bf16": "bf16",
+        "bfloat16": "bf16",
+        "torch.bfloat16": "bf16",
+        "fp16": "fp16",
+        "float16": "fp16",
+        "torch.float16": "fp16",
+        "half": "fp16",
+        "fp32": "fp32",
+        "float32": "fp32",
+        "torch.float32": "fp32",
+        "full": "fp32",
+    }
+    if requested_text not in aliases:
+        raise ValueError("precision must be one of: auto, bf16, fp16, fp32")
+    precision = aliases[requested_text]
+    if not torch.cuda.is_available():
+        if precision != "fp32" and console is not None:
+            console.print("CUDA is unavailable; using fp32 precision.")
+        return torch.float32
+
+    major, minor = torch.cuda.get_device_capability()
+    supports_bf16 = cuda_supports_bf16()
+    if precision == "auto":
+        dtype = torch.bfloat16 if supports_bf16 else torch.float16
+    elif precision == "bf16":
+        if not supports_bf16:
+            if console is not None:
+                console.print(f"bf16 was requested but CUDA capability sm_{major}{minor} does not support it; using fp16.")
+            dtype = torch.float16
+        else:
+            dtype = torch.bfloat16
+    elif precision == "fp16":
+        dtype = torch.float16
+    else:
+        dtype = torch.float32
+
+    if console is not None:
+        console.print(f"Using {dtype_label(dtype)} precision on CUDA capability sm_{major}{minor}.")
+    return dtype
+
+
+def cuda_supports_bf16() -> bool:
+    try:
+        return bool(torch.cuda.is_bf16_supported())
+    except Exception:
         major, _minor = torch.cuda.get_device_capability()
-        return torch.bfloat16 if major >= 8 else torch.float16
-    return torch.float32
+        return major >= 8
+
+
+def dtype_label(dtype: Any) -> str:
+    if dtype == torch.bfloat16:
+        return "bf16"
+    if dtype == torch.float16:
+        return "fp16"
+    if dtype == torch.float32:
+        return "fp32"
+    return str(dtype)
+
+
+def resolve_warmup_steps(
+        requested_steps: Any,
+        requested_ratio: Any,
+        train_size: int,
+        per_device_train_batch_size: int,
+        gradient_accumulation_steps: int,
+        num_epochs: float,
+        max_steps: int,
+) -> int:
+    warmup_steps = optional_nonnegative_int(requested_steps)
+    if warmup_steps is not None:
+        return warmup_steps
+    warmup_ratio = float(requested_ratio or 0.0)
+    if warmup_ratio <= 0.0:
+        return 0
+    if max_steps > 0:
+        total_steps = max_steps
+    else:
+        effective_batch_size = max(1, per_device_train_batch_size) * max(1, gradient_accumulation_steps)
+        steps_per_epoch = max(1, math.ceil(train_size / effective_batch_size))
+        total_steps = max(1, math.ceil(steps_per_epoch * max(0.0, num_epochs)))
+    return int(math.ceil(total_steps * warmup_ratio))
+
+
+def prepare_trainable_parameters_for_amp(model: Any, dtype: Any, console: Console) -> None:
+    if dtype != torch.float16:
+        return
+    converted_tensors = 0
+    converted_params = 0
+    for parameter in model.parameters():
+        if not parameter.requires_grad or not parameter.is_floating_point():
+            continue
+        if parameter.dtype not in {torch.float16, torch.bfloat16}:
+            continue
+        converted_tensors += 1
+        converted_params += parameter.numel()
+        with torch.no_grad():
+            parameter.data = parameter.data.float()
+            if parameter.grad is not None:
+                parameter.grad.data = parameter.grad.data.float()
+    if converted_tensors:
+        console.print(
+            f"Promoted {converted_tensors} trainable tensor(s) ({converted_params:,} parameters) to fp32 for fp16 AMP."
+        )
 
 
 def choose_attention_backends(requested: str) -> list[str | None]:
