@@ -141,6 +141,7 @@ Example MedGemma 1.5 config:
 ```yaml
 # configs/train-medgemma15.yaml
 model_name_or_path: google/medgemma-1.5-4b-it
+precision: auto  # fp16 on Colab T4/V100, bf16 on A100/H100/L4+
 image_size: 896
 resize_mode: square
 max_images_per_sample: 1
@@ -187,6 +188,7 @@ name and model:
 # configs/train-medgemma1.yaml
 model_name_or_path: google/medgemma-4b-it
 model_output_dir: output/flare-medgemma1-medgemma1-lora
+precision: auto  # fp16 on Colab T4/V100, bf16 on A100/H100/L4+
 image_size: 896
 resize_mode: square
 max_images_per_sample: 1
